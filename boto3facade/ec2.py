@@ -13,7 +13,8 @@ class Ec2:
         sel_imgs = []
         for img in imgs:
             matched = True
-            img_tags = {tag['Key']: tag['Value'] for tag in img['Tags']}
+            img_tags = {tag['Key']: tag['Value']
+                        for tag in img.get('Tags', [])}
             for k, v in tags.items():
                 if k not in img_tags or v != img_tags[k]:
                     matched = False
