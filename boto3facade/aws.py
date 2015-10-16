@@ -23,15 +23,13 @@ class AwsFacade():
     def resource(self):
         pass
 
-    def _get_resource(self, restype, describe_params=None):
+    def _get_resource(self, restype, **kwargs):
         """Returns a list of AWS resources"""
         method = getattr(self.client, "describe_{}s".format(
             inflection.underscore(restype)))
-        if describe_params is not None:
-            def describe():
-                return method(describe_params)
-        else:
-            describe = method
+
+        def describe():
+            return method(**kwargs)
 
         resource = getattr(self.resource, restype)
         return (resource(v[_get_id_field(restype)])

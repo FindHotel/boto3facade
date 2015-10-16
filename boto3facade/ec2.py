@@ -23,11 +23,17 @@ class Ec2(AwsFacade):
                 sel_imgs.append(img)
         return sel_imgs
 
-    def get_vpc_by_tag(self, key, value):
-        """Produces the Vpc that matches the requested name"""
-        return filter(utils.tag_filter(key, value), self._get_resource('Vpc'))
+    def get_ami_by_name(self, name):
+        """Returns AMIs with a matching Name tag"""
+        return filter(utils.tag_filter('Name', name),
+                      self._get_resource('Image', Owners=['self']))
 
-    def get_sg_by_tag(self, key, value):
+    def get_vpc_by_name(self, name):
+        """Produces the Vpc that matches the requested name"""
+        return filter(utils.tag_filter('Name', name),
+                      self._get_resource('Vpc'))
+
+    def get_sg_by_name(self, name):
         """Produces a SecurityGroup object that matches the requested name"""
-        return filter(utils.tag_filter(key, value),
+        return filter(utils.tag_filter('Name', name),
                       self._get_resource('SecurityGroup'))
