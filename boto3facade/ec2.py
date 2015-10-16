@@ -15,8 +15,7 @@ class Ec2(AwsFacade):
         sel_imgs = []
         for img in imgs:
             matched = True
-            img_tags = {tag['Key']: tag['Value']
-                        for tag in img.get('Tags', [])}
+            img_tags = utils.unroll_tags(img.get('Tags', {}))
             for k, v in tags.items():
                 if k not in img_tags or v != img_tags[k]:
                     matched = False
@@ -26,8 +25,9 @@ class Ec2(AwsFacade):
 
     def get_vpc_by_tag(self, key, value):
         """Produces the Vpc that matches the requested name"""
-        return self._get_resource_by_tag('Vpc', key, value)
+        return filter(utils.tag_filter(key, value), self._get_resource('Vpc'))
 
     def get_sg_by_tag(self, key, value):
         """Produces a SecurityGroup object that matches the requested name"""
-        return self._get_resource_by_tag('SecurityGroup', key, value)
+        return filter(utils.tag_filter(key, value),
+                      self._get_resource('SecurityGroup'))

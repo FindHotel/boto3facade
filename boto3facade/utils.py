@@ -49,3 +49,10 @@ def unroll_tags(tags):
 def has_tag(tags, key, value):
     """Returns true if a resource tag has a given value"""
     return unroll_tags(tags).get(key, None) == value
+
+
+def tag_filter(key, value):
+    """Returns true if a resource tags match the provided tags"""
+    def filtfunc(r):
+        return unroll_tags(r.tags or {}).get(key, None) == value
+    return filtfunc

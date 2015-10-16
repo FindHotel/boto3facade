@@ -3,8 +3,14 @@
 
 
 import abc
-import boto3facade.utils as utils
 import inflection
+
+
+def _get_id_field(restype):
+    if restype == 'SecurityGroup':
+        return 'GroupId'
+    else:
+        return restype + 'Id'
 
 
 class AwsFacade():
@@ -17,10 +23,16 @@ class AwsFacade():
     def resource(self):
         pass
 
-    def _get_resource_by_tag(self, res_type, key, value):
-        """Finds EC2 resources by tags"""
+    def _get_resource(self, restype, describe_params=None):
+        """Returns a list of AWS resources"""
         method = getattr(self.client, "describe_{}s".format(
-            inflection.underscore(res_type)))
-        resource = getattr(self.resource, res_type)
-        return [resource(v[res_type + 'Id']) for v in method()[res_type + 's']
-                if utils.has_tag(v.get('Tags', {}), key, value)]
+            inflection.underscore(restype)))
+        if describe_params is not None:
+            def describe():
+                return method(describe_params)
+        else:
+            describe = method
+
+        resource = getattr(self.resource, restype)
+        return (resource(v[_get_id_field(restype)])
+                for v in describe()[restype + 's'])
