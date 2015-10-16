@@ -1,6 +1,8 @@
 import boto3facade.utils as utils
+from boto3facade.aws import AwsFacade
 
 
-@utils.cached_client('ec2')
-class Redshift:
+@utils.cached_client('redshift')
+@utils.cached_resource('redshift')
+class Redshift(AwsFacade):
     pass
