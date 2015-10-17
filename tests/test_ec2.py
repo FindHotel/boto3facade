@@ -32,6 +32,18 @@ def testvpc(randomstr, ec2client):
     ec2client.delete_vpc(VpcId=vpcid)
 
 
+@pytest.yield_fixture(scope="module")
+def testsubnet(randomstr, ec2client, testvpc):
+    resp = ec2client.create_subnet(
+        VpcId=testvpc.id,
+        CidrBlock='10.49.0.0/24')
+    subnetid = resp['Subnet']['SubnetId']
+    subnet = boto3.resource('ec2').Subnet(subnetid)
+    subnet.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
+    yield subnet
+    ec2client.delete_subnet(SubnetId=subnetid)
+
+
 def test_get_ami_by_tag_no_match(ec2, randomstr):
     """Try to retrieve by tag an AMI that does not exist"""
     ami_id = ec2.get_ami_by_tag({'Name': randomstr})
@@ -53,7 +65,18 @@ def test_get_vpc_by_name_no_math(ec2, randomstr):
     assert list(vpc) == []
 
 
+def test_get_subnet_by_name_no_math(ec2, randomstr):
+    subnet = ec2.get_subnet_by_name(randomstr)
+    assert list(subnet) == []
+
+
 def test_get_vpc_by_name(ec2, randomstr, testvpc):
     vpc = list(ec2.get_vpc_by_name(randomstr))
     assert len(vpc) == 1
     assert vpc[0].id == testvpc.id
+
+
+def test_get_subnet_by_name(ec2, randomstr, testsubnet):
+    subnet = list(ec2.get_subnet_by_name(randomstr))
+    assert len(subnet) == 1
+    assert subnet[0].id == testsubnet.id

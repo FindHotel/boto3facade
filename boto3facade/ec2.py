@@ -29,9 +29,14 @@ class Ec2(AwsFacade):
                       self._get_resource('Image', Owners=['self']))
 
     def get_vpc_by_name(self, name):
-        """Produces the Vpc that matches the requested name"""
+        """Produces the Subnet that matches the requested name"""
         return filter(utils.tag_filter('Name', name),
                       self._get_resource('Vpc'))
+
+    def get_subnet_by_name(self, name):
+        """Produces the Vpc that matches the requested name"""
+        return filter(utils.tag_filter('Name', name),
+                      self._get_resource('Subnet'))
 
     def get_sg_by_name(self, name):
         """Produces a SecurityGroup object that matches the requested name"""
