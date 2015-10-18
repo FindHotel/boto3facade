@@ -3,7 +3,11 @@
 
 
 import boto3facade.utils as utils
+import requests
+import json
+import os
 from boto3facade.aws import AwsFacade
+from configparser import ConfigParser
 
 
 @utils.cached_client('ec2')
@@ -42,3 +46,28 @@ class Ec2(AwsFacade):
         """Produces a SecurityGroup object that matches the requested name"""
         return filter(utils.tag_filter('Name', name),
                       self._get_resource('SecurityGroup'))
+
+    def get_temporary_credentials(self, role_name=None):
+        """Produces a tuple of 3 elements: key id, secret key and token"""
+        if role_name is not None:
+            resp = requests.get("http://169.254.169.254/latest/meta-data/iam/"
+                                "security-credentials/{}".format(role_name))
+            if resp.status_code == 200:
+                resp = json.loads(resp.content.decode())
+                return (resp['AccessKeyId'],
+                        resp['SecretAccessKey'],
+                        resp['Token'])
+        return self.get_credentials()
+
+    def get_credentials(self):
+        """Produces a tuple with the local AWS credentials"""
+        key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        if key_id is None or secret_key is None:
+            aws_creds_ini = os.path.join(
+                os.path.expanduser('~'), '.aws', 'credentials')
+            cfg = ConfigParser()
+            cfg.read(aws_creds_ini)
+            if 'default' in cfg.sections():
+                return (cfg['default']['aws_secret_access_key'],
+                        cfg['default']['aws_access_key_id'])
