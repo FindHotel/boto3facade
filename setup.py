@@ -256,7 +256,8 @@ setup_dict = dict(
     install_requires=[
         'click>=5.1',
         'future',
-        'inflection>=0.3.1'
+        'inflection>=0.3.1',
+        'requests>=2.8.1'
     ] + python_version_specific_requires,
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
