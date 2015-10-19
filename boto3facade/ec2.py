@@ -8,6 +8,7 @@ import json
 import os
 from boto3facade.aws import AwsFacade
 from configparser import ConfigParser
+from requests.adapters import ConnectTimeout
 
 
 @utils.cached_client('ec2')
@@ -50,14 +51,21 @@ class Ec2(AwsFacade):
     def get_temporary_credentials(self, role_name=None):
         """Produces a tuple of 3 elements: key id, secret key and token"""
         if role_name is not None:
-            resp = requests.get("http://169.254.169.254/latest/meta-data/iam/"
-                                "security-credentials/{}".format(role_name))
-            if resp.status_code == 200:
+            try:
+                resp = requests.get("http://169.254.169.254/latest/meta-data/"
+                                    "iam/security-credentials/{}".format(
+                                        role_name),
+                                    timeout=1)
+            except ConnectTimeout:
+                # That's OK, probably we are running this outside the AWS cloud
+                # and there are no temporary credentials available
+                resp = None
+
+            if resp is not None and resp.status_code == 200:
                 resp = json.loads(resp.content.decode())
                 return (resp['AccessKeyId'],
                         resp['SecretAccessKey'],
                         resp['Token'])
-        return self.get_credentials()
 
     def get_credentials(self):
         """Produces a tuple with the local AWS credentials"""
