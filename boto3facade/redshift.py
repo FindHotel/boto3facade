@@ -14,16 +14,17 @@ class Redshift(AwsFacade):
 
 
 # Utility methods
-def make_copy_s3_credentials(ec2_creds):
+def make_copy_s3_credentials(creds):
     """Creates the credentials parameter for the copy command"""
-    if len(ec2_creds) == 2:
+    if len(creds) == 2:
         # Permanent credentials: no token
         cr = "aws_access_key_id={};aws_secret_access_key={}".format(
-            *ec2_creds)
-    elif len(ec2_creds) == 3:
+            creds.key_id, creds.secret_key)
+    elif len(creds) == 3:
         # Temporary (role) credentials: temporary token
         cr = "aws_access_key_id={};aws_secret_access_key={};token={}".format(
-            *ec2_creds)
+            creds.key_id, creds.secret_key, creds.token)
     else:
-        raise CredentialsError("Can't retrieve AWS credentials", logger=logger)
+        raise CredentialsError("Wrongly formatted credentials: {}".format(
+            creds), logger=logger)
     return cr
