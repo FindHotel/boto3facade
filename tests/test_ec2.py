@@ -80,8 +80,3 @@ def test_get_subnet_by_name(ec2, randomstr, testsubnet):
     subnet = list(ec2.get_subnet_by_name(randomstr))
     assert len(subnet) == 1
     assert subnet[0].id == testsubnet.id
-
-
-def test_get_temporary_credentials(ec2, randomstr):
-    creds = ec2.get_temporary_credentials(role_name=randomstr)
-    assert creds is None
