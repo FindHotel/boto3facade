@@ -78,5 +78,5 @@ class Ec2(AwsFacade):
             cfg = ConfigParser()
             cfg.read(aws_creds_ini)
             if 'default' in cfg.sections():
-                return (cfg['default']['aws_secret_access_key'],
-                        cfg['default']['aws_access_key_id'])
+                return (cfg['default']['aws_access_key_id'],
+                        cfg['default']['aws_secret_access_key'])
