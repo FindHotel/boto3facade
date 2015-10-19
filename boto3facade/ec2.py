@@ -9,6 +9,7 @@ import os
 from boto3facade.aws import AwsFacade
 from configparser import ConfigParser
 from requests.adapters import ConnectTimeout
+from requests.exceptions import ConnectionError
 
 
 @utils.cached_client('ec2')
@@ -56,7 +57,7 @@ class Ec2(AwsFacade):
                                     "iam/security-credentials/{}".format(
                                         role_name),
                                     timeout=1)
-            except ConnectTimeout:
+            except (ConnectTimeout, ConnectionError):
                 # That's OK, probably we are running this outside the AWS cloud
                 # and there are no temporary credentials available
                 resp = None
