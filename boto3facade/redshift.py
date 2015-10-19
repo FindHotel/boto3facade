@@ -1,6 +1,10 @@
 import boto3facade.utils as utils
+import logging
 from boto3facade.aws import AwsFacade
 from boto3facade.exceptions import CredentialsError
+
+
+logger = logging.getLogger(__name__)
 
 
 @utils.cached_client('redshift')
@@ -21,5 +25,5 @@ def make_copy_s3_credentials(ec2_creds):
         cr = "aws_access_key_id={};aws_secret_access_key={};token={}".format(
             *ec2_creds)
     else:
-        raise CredentialsError("Can't retrieve AWS credentials")
+        raise CredentialsError("Can't retrieve AWS credentials", logger=logger)
     return cr
