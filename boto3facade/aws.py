@@ -21,7 +21,7 @@ def _get_id_field(restype):
 
 
 TemporaryCredentials = namedtuple('TemporaryCredentials',
-                                  'key_id secret_key role')
+                                  'key_id secret_key token')
 
 Credentials = namedtuple('Credentials', 'key_id secret_key')
 
