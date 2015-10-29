@@ -3,6 +3,7 @@
 
 
 import boto3
+from botocore.loaders import DataNotFoundError
 
 
 def cached_client(service):
@@ -10,7 +11,6 @@ def cached_client(service):
     boto3 facade object"""
 
     def decorator(cls):
-        cls.__client = None
 
         def get_client(self):
             if not hasattr(get_client, 'cached_client'):
@@ -28,11 +28,13 @@ def cached_resource(service):
     boto3 facade object"""
 
     def decorator(cls):
-        cls.__client = None
 
         def get_resource(self):
             if not hasattr(get_resource, 'cached_resource'):
-                get_resource.cached_resource = boto3.resource(service)
+                try:
+                    get_resource.cached_resource = boto3.resource(service)
+                except DataNotFoundError:
+                    get_resource.cached_resource = None
             return get_resource.cached_resource
 
         cls.resource = property(get_resource)
@@ -54,5 +56,8 @@ def has_tag(tags, key, value):
 def tag_filter(key, value):
     """Returns true if a resource tags match the provided tags"""
     def filtfunc(r):
-        return unroll_tags(r.tags or {}).get(key, None) == value
+        if isinstance(r, dict):
+            return unroll_tags(r.get('Tags', {})).get(key, None) == value
+        else:
+            return unroll_tags(r.tags or {}).get(key, None) == value
     return filtfunc

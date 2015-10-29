@@ -11,6 +11,7 @@ from requests.exceptions import ConnectionError
 from configparser import ConfigParser
 from collections import namedtuple
 import requests
+import boto3facade.utils as utils
 
 
 def _get_id_field(restype):
@@ -72,6 +73,14 @@ class AwsFacade():
     def resource(self):
         pass
 
+    def get_resource_by_tag(self, restype, tags, **kwargs):
+        """Returns the AMIs that match the provided tags"""
+        resources = self._get_resource(restype, **kwargs)
+        for k, v in tags.items():
+            resources = filter(utils.tag_filter(k, v), resources)
+
+        return resources
+
     def _get_resource(self, restype, **kwargs):
         """Returns a list of AWS resources"""
         method = getattr(self.client, "describe_{}s".format(
@@ -80,6 +89,9 @@ class AwsFacade():
         def describe():
             return method(**kwargs)
 
-        resource = getattr(self.resource, restype)
-        return (resource(v[_get_id_field(restype)])
-                for v in describe()[restype + 's'])
+        if self.resource:
+            resource = getattr(self.resource, restype)
+            return (resource(v[_get_id_field(restype)])
+                    for v in describe()[restype + 's'])
+        else:
+            return (r for r in describe()[restype + 's'])
