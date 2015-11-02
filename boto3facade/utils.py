@@ -3,6 +3,7 @@
 
 
 import boto3
+import inflection
 from botocore.loaders import DataNotFoundError
 
 
@@ -60,4 +61,14 @@ def tag_filter(key, value):
             return unroll_tags(r.get('Tags', {})).get(key, None) == value
         else:
             return unroll_tags(r.tags or {}).get(key, None) == value
+    return filtfunc
+
+
+def property_filter(key, value):
+    """Returns true if a resource property matches the provided value"""
+    def filtfunc(r):
+        if isinstance(r, dict):
+            return r.get(inflection.camelize(key)) == value
+        else:
+            return getattr(r, inflection.underscore(key)) == value
     return filtfunc

@@ -73,12 +73,22 @@ class AwsFacade():
     def resource(self):
         pass
 
-    def get_resource_by_tag(self, restype, tags, **kwargs):
-        """Returns the AMIs that match the provided tags"""
+    def get_resource_by_tag(self, *args, **kwargs):
+        """An alias of filter_resource_by_tag"""
+        return self.filter_resource_by_tag(self, *args, **kwargs)
+
+    def filter_resource_by_tag(self, restype, tags, **kwargs):
+        """Get the list of resources that match the provided tags"""
         resources = self._get_resource(restype, **kwargs)
         for k, v in tags.items():
             resources = filter(utils.tag_filter(k, v), resources)
+        return resources
 
+    def filter_resource_by_property(self, restype, props, **kwargs):
+        """Get the list of resources that match the provided properties"""
+        resources = self._get_resource(restype, **kwargs)
+        for k, v in props.items():
+            resources = filter(utils.property_filter(k, v), resources)
         return resources
 
     def _get_resource(self, restype, **kwargs):

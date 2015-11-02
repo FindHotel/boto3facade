@@ -40,5 +40,5 @@ class Ec2(AwsFacade):
 
     def get_sg_by_name(self, name):
         """Produces a SecurityGroup object that matches the requested name"""
-        return filter(utils.tag_filter('Name', name),
-                      self._get_resource('SecurityGroup'))
+        props = {'GroupName': name}
+        return self.filter_resource_by_property('SecurityGroup', props)

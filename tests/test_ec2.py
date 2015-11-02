@@ -4,7 +4,9 @@
 import pytest
 import uuid
 from boto3facade.ec2 import Ec2
+from botocore.exceptions import ClientError
 import boto3
+import time
 
 
 @pytest.yield_fixture(scope="module")
@@ -29,7 +31,24 @@ def testvpc(randomstr, ec2client):
     vpc = boto3.resource('ec2').Vpc(vpcid)
     vpc.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
     yield vpc
-    ec2client.delete_vpc(VpcId=vpcid)
+    try:
+        ec2client.delete_vpc(VpcId=vpcid)
+    except ClientError:
+        # Wait for dependencies to be deleted and retry
+        time.sleep(3)
+        ec2client.delete_vpc(VpcId=vpcid)
+
+
+@pytest.yield_fixture(scope="module")
+def testsg(randomstr, ec2client, testvpc):
+    resp = ec2client.create_security_group(
+        GroupName=randomstr, Description='test group (delete me!)',
+        VpcId=testvpc.id)
+    sgid = resp['GroupId']
+    sg = boto3.resource('ec2').SecurityGroup(sgid)
+    sg.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
+    yield sg
+    ec2client.delete_security_group(GroupId=sg.id)
 
 
 @pytest.yield_fixture(scope="module")
@@ -74,6 +93,12 @@ def test_get_vpc_by_name(ec2, randomstr, testvpc):
     vpc = list(ec2.get_vpc_by_name(randomstr))
     assert len(vpc) == 1
     assert vpc[0].id == testvpc.id
+
+
+def test_filter_resource_by_property(ec2, randomstr, testsg):
+    sg = list(ec2.get_sg_by_name(randomstr))
+    assert len(sg) == 1
+    assert sg[0].id == testsg.id
 
 
 def test_get_subnet_by_name(ec2, randomstr, testsubnet):

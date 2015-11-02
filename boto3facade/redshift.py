@@ -10,7 +10,13 @@ logger = logging.getLogger(__name__)
 @utils.cached_client('redshift')
 @utils.cached_resource('redshift')
 class Redshift(AwsFacade):
-    pass
+    def get_cluster_by_tag(self, tags, **kwargs):
+        """Gets a list of clusters that match the provided set of tags"""
+        return self.get_resource_by_tag('Cluster', tags, **kwargs)
+
+    def get_subnet_group_by_name(self, name, **kwargs):
+        """Gets the Redshift subnet group with the given name"""
+        pass
 
 
 # Utility methods
