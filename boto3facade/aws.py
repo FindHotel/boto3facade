@@ -58,9 +58,11 @@ def get_credentials():
         cfg = ConfigParser()
         cfg.read(aws_creds_ini)
         if 'default' in cfg.sections():
-            return Credentials(
-                cfg['default']['aws_access_key_id'],
-                cfg['default']['aws_secret_access_key'])
+            key_id = cfg['default']['aws_access_key_id']
+            secret_key = cfg['default']['aws_secret_access_key']
+
+    if key_id is not None:
+        return Credentials(key_id, secret_key)
 
 
 class AwsFacade():
