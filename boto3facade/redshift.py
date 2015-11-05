@@ -7,6 +7,10 @@ from boto3facade.exceptions import CredentialsError
 logger = logging.getLogger(__name__)
 
 
+class InvalidCredentials(Exception):
+    pass
+
+
 @utils.cached_client('redshift')
 @utils.cached_resource('redshift')
 class Redshift(AwsFacade):
@@ -22,6 +26,8 @@ class Redshift(AwsFacade):
 # Utility methods
 def make_copy_s3_credentials(creds):
     """Creates the credentials parameter for the copy command"""
+    if creds is None:
+        raise InvalidCredentials("Passed None when tuple was expected")
     if len(creds) == 2:
         # Permanent credentials: no token
         cr = "aws_access_key_id={};aws_secret_access_key={}".format(

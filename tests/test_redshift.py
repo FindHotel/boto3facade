@@ -38,3 +38,8 @@ def test_make_copy_s3_local_credentials(local_creds):
     creds = rs.make_copy_s3_credentials(local_creds)
     assert creds == "aws_access_key_id={};aws_secret_access_key={}".format(
         local_creds.key_id, local_creds.secret_key)
+
+
+def test_get_cluster_by_tag():
+    pass
+
