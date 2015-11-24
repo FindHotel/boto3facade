@@ -77,7 +77,7 @@ class AwsFacade():
 
     def get_resource_by_tag(self, *args, **kwargs):
         """An alias of filter_resource_by_tag"""
-        return self.filter_resource_by_tag(self, *args, **kwargs)
+        return self.filter_resource_by_tag(*args, **kwargs)
 
     def filter_resource_by_tag(self, restype, tags, **kwargs):
         """Get the list of resources that match the provided tags"""
