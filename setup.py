@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
     name='boto3facade',
+    packages=find_packages(),
     version='0.1',
     # To integrate py.test with setuptools
     setup_requires=['pytest-runner'],
