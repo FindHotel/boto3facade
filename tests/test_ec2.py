@@ -6,7 +6,6 @@ import uuid
 from boto3facade.ec2 import Ec2
 from boto3facade.utils import get_session
 from botocore.exceptions import ClientError
-import boto3
 import time
 
 
@@ -30,11 +29,16 @@ def ec2client(session):
     yield session.client('ec2')
 
 
+@pytest.yield_fixture(scope='module')
+def ec2resource(session):
+    yield session.resource('ec2')
+
+
 @pytest.yield_fixture(scope="module")
-def testvpc(randomstr, ec2client):
+def testvpc(randomstr, ec2client, ec2resource):
     resp = ec2client.create_vpc(CidrBlock='10.49.0.0/16')
     vpcid = resp['Vpc']['VpcId']
-    vpc = boto3.resource('ec2').Vpc(vpcid)
+    vpc = ec2resource.Vpc(vpcid)
     vpc.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
     yield vpc
     try:
@@ -51,7 +55,7 @@ def testsg(randomstr, ec2client, testvpc):
         GroupName=randomstr, Description='test group (delete me!)',
         VpcId=testvpc.id)
     sgid = resp['GroupId']
-    sg = boto3.resource('ec2').SecurityGroup(sgid)
+    sg = ec2resource.SecurityGroup(sgid)
     sg.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
     yield sg
     ec2client.delete_security_group(GroupId=sg.id)
@@ -63,7 +67,7 @@ def testsubnet(randomstr, ec2client, testvpc):
         VpcId=testvpc.id,
         CidrBlock='10.49.0.0/24')
     subnetid = resp['Subnet']['SubnetId']
-    subnet = boto3.resource('ec2').Subnet(subnetid)
+    subnet = ec2resource.Subnet(subnetid)
     subnet.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
     yield subnet
     ec2client.delete_subnet(SubnetId=subnetid)
