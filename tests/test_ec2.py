@@ -21,8 +21,13 @@ def ec2():
 
 
 @pytest.yield_fixture(scope='module')
-def ec2client():
-    yield get_session().client('ec2')
+def session():
+    yield get_session()
+
+
+@pytest.yield_fixture(scope='module')
+def ec2client(session):
+    yield session.client('ec2')
 
 
 @pytest.yield_fixture(scope="module")
