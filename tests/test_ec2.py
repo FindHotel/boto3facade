@@ -4,6 +4,7 @@
 import pytest
 import uuid
 from boto3facade.ec2 import Ec2
+from boto3facade.utils import get_session
 from botocore.exceptions import ClientError
 import boto3
 import time
@@ -21,7 +22,7 @@ def ec2():
 
 @pytest.yield_fixture(scope='module')
 def ec2client():
-    yield boto3.client('ec2')
+    yield get_session().client('ec2')
 
 
 @pytest.yield_fixture(scope="module")

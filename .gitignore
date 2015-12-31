@@ -40,3 +40,5 @@ pip-log.txt
 
 # Virtualenv
 .env
+
+.cache
