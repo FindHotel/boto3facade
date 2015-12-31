@@ -2,9 +2,25 @@
 # -*- coding: utf-8 -*-
 
 
-import boto3
 import inflection
+import os
 from botocore.loaders import DataNotFoundError
+from boto3.session import Session
+
+
+def get_session():
+    """Gets a boto3 session object"""
+    if not hasattr(get_session, 'cached_session'):
+        profile_name = os.environ.get('AWS_PROFILE_NAME')
+        region_name = os.environ.get('AWS_REGION_NAME')
+        if profile_name:
+            get_session.cached_session = Session(profile_name=profile_name)
+        elif region_name:
+            get_session.cached_session = Session(region_name=region_name)
+        else:
+            get_session.cached_session = Session()
+
+    return get_session.cached_session
 
 
 def cached_client(service):
@@ -15,7 +31,7 @@ def cached_client(service):
 
         def get_client(self):
             if not hasattr(get_client, 'cached_client'):
-                get_client.cached_client = boto3.client(service)
+                get_client.cached_client = get_session().client(service)
             return get_client.cached_client
 
         cls.client = property(get_client)
@@ -33,7 +49,8 @@ def cached_resource(service):
         def get_resource(self):
             if not hasattr(get_resource, 'cached_resource'):
                 try:
-                    get_resource.cached_resource = boto3.resource(service)
+                    get_resource.cached_resource = get_session().resource(
+                        service)
                 except DataNotFoundError:
                     get_resource.cached_resource = None
             return get_resource.cached_resource
