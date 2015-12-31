@@ -50,7 +50,7 @@ def testvpc(randomstr, ec2client, ec2resource):
 
 
 @pytest.yield_fixture(scope="module")
-def testsg(randomstr, ec2client, testvpc):
+def testsg(randomstr, ec2client, ec2resource, testvpc):
     resp = ec2client.create_security_group(
         GroupName=randomstr, Description='test group (delete me!)',
         VpcId=testvpc.id)
@@ -62,7 +62,7 @@ def testsg(randomstr, ec2client, testvpc):
 
 
 @pytest.yield_fixture(scope="module")
-def testsubnet(randomstr, ec2client, testvpc):
+def testsubnet(randomstr, ec2client, ec2resource, testvpc):
     resp = ec2client.create_subnet(
         VpcId=testvpc.id,
         CidrBlock='10.49.0.0/24')
