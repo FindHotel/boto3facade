@@ -11,9 +11,7 @@ A simple facade for boto3 that makes some common tasks easier.
 ```
 
 
-## Development environment
-
-To setup the development environment::
+## Development
 
 ```
     make develop
