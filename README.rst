@@ -8,7 +8,7 @@ A simple facade for boto3 that makes some common tasks easier.
 Installation
 ============
 
-::
+  ::
     pip install git+https://github.com/InnovativeTravel/boto3facade
 
 
