@@ -12,6 +12,7 @@ from configparser import ConfigParser
 from collections import namedtuple
 import requests
 import boto3facade.utils as utils
+from boto3facade.exceptions import CredentialsError
 
 
 def _get_id_field(restype):
@@ -57,9 +58,16 @@ def get_credentials():
             os.path.expanduser('~'), '.aws', 'credentials')
         cfg = ConfigParser()
         cfg.read(aws_creds_ini)
-        if 'default' in cfg.sections():
-            key_id = cfg['default']['aws_access_key_id']
-            secret_key = cfg['default']['aws_secret_access_key']
+        profiles = cfg.sections()
+        if 'default' in profiles:
+            profile = 'default'
+        elif len(profiles) < 1:
+            msg = 'No credentials could be found in ~/.aws/credentials'
+            raise CredentialsError(msg)
+        else:
+            profile = profiles[0]
+        key_id = cfg[profile]['aws_access_key_id']
+        secret_key = cfg[profile]['aws_secret_access_key']
 
     if key_id is not None:
         return Credentials(key_id, secret_key)
