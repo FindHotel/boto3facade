@@ -1,10 +1,5 @@
-test:
-  pre:
-      - pip install -r requirements-dev.txt
-checkout:
-  post:
-    - git submodule sync
-    - git submodule update --init
 machine:
+  pre:
+    pip install setuptools --upgrade
   python:
     version: 3.4.2
