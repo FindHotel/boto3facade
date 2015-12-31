@@ -24,6 +24,6 @@ setup(
     tests_require=[
         'pytest>=2.5.1',
         'mock>=1.0.1',
-        'flake8>=2.1.0',
+        'flake8>=2.1.0'
     ],
 )
