@@ -1,4 +1,4 @@
-deployment:
+dependencies:
   pre:
     - pip install setuptools --upgrade
 machine:
