@@ -2,13 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
 import boto3facade.ec2 as ec2
 from boto3facade.aws import AwsFacade
 from boto3facade.exceptions import CredentialsError
-
-
-logger = logging.getLogger(__name__)
 
 
 class Redshift(AwsFacade):
@@ -38,7 +34,7 @@ class Redshift(AwsFacade):
         creds = self.get_credentials()
         if creds is None:
             msg = "Unable to retrieve AWS credentials"
-            raise CredentialsError(msg, logger=logger)
+            raise CredentialsError(msg, logger=self.logger)
         else:
             return "aws_access_key_id={};aws_secret_access_key={}".format(
                 creds.key_id, creds.secret_key)
