@@ -59,7 +59,13 @@ class AwsFacade():
             if aws_profile == '' or aws_profile == 'default':
                 # Use the default creds for this system (maybe temporary
                 # creds from a role)
-                self.__session = Session()
+                aws_region = self.profile.get('aws_region')
+                if aws_region:
+                    # Region specified in the boto3facade profile.
+                    self.__session = Session(region_name=aws_region)
+                else:
+                    # Use the settings in ~/.aws/config
+                    self.__session = Session()
             else:
                 self.__session = Session(
                     profile_name=self.profile.get('aws_profile'))
