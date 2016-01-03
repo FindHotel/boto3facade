@@ -3,9 +3,10 @@
 
 import pytest
 import uuid
-from boto3facade.ec2 import Ec2
-from boto3facade.utils import get_session
+from boto3facade.ec2 import (Ec2, TemporaryCredentials,
+                             get_temporary_credentials)
 from botocore.exceptions import ClientError
+from collections import namedtuple
 import time
 
 
@@ -20,18 +21,13 @@ def ec2():
 
 
 @pytest.yield_fixture(scope='module')
-def session():
-    yield get_session()
+def ec2client(ec2):
+    yield ec2.client
 
 
 @pytest.yield_fixture(scope='module')
-def ec2client(session):
-    yield session.client('ec2')
-
-
-@pytest.yield_fixture(scope='module')
-def ec2resource(session):
-    yield session.resource('ec2')
+def ec2resource(ec2):
+    yield ec2.resource
 
 
 @pytest.yield_fixture(scope="module")
@@ -115,3 +111,32 @@ def test_get_subnet_by_name(ec2, randomstr, testsubnet):
     subnet = list(ec2.get_subnet_by_name(randomstr))
     assert len(subnet) == 1
     assert subnet[0].id == testsubnet.id
+
+
+def test_get_temporary_credentials_in_ec2(monkeypatch):
+    monkeypatch.setattr('boto3facade.ec2.in_ec2', lambda: True)
+    Role = namedtuple('Role', 'name')
+
+    def get_role():
+        return Role('dummyrole')
+
+    monkeypatch.setattr('boto3facade.ec2.get_instance_profile_role', get_role)
+
+    def get_metadata(field):
+        if field == 'iam/security-credentials/dummyrole':
+            return {'AccessKeyId': 'blahblah',
+                    'SecretAccessKey': 'yeahyeah',
+                    'Token': 'pupu'}
+
+    monkeypatch.setattr('boto3facade.ec2.get_instance_metadata', get_metadata)
+    creds = get_temporary_credentials()
+    # Running tests in an EC2 instance: must have a role associated to it
+    assert isinstance(creds, TemporaryCredentials)
+    expected_fields = {'key_id', 'secret_key', 'token'}
+    assert not set(creds._fields).difference(expected_fields)
+
+
+def test_get_temporary_credentials_outside_ec2(monkeypatch):
+    monkeypatch.setattr('boto3facade.ec2.in_ec2', lambda: False)
+    creds = get_temporary_credentials()
+    assert creds is None

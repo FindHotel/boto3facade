@@ -3,62 +3,35 @@
 
 
 import inflection
-import os
-from botocore.loaders import DataNotFoundError
-from boto3.session import Session
 
 
-def get_session():
-    """Gets a boto3 session object"""
-    if not hasattr(get_session, 'cached_session'):
-        profile_name = os.environ.get('AWS_PROFILE_NAME')
-        region_name = os.environ.get('AWS_REGION_NAME')
-        if profile_name:
-            get_session.cached_session = Session(profile_name=profile_name)
-        elif region_name:
-            get_session.cached_session = Session(region_name=region_name)
-        else:
-            get_session.cached_session = Session()
+class Stub():
+    """Stub methods, keep track of calls."""
 
-    return get_session.cached_session
+    def __init__(self, monkeypatch):
+        self.monkeypatch = monkeypatch
+        self.stubbed = {}
 
+    def stub(self, obj, **kwargs):
+        """Stub obj.method to return whatever parameter was passed for method.
+        Usage: stub(datetime.date, today='today')
+        It's possible to stub several methods on the same object at once.
+        """
+        self.stubbed.setdefault(obj, {})
+        for method, val in kwargs.items():
+            self._stub(obj, method, val)
+        return self.stubbed[obj]
 
-def cached_client(service):
-    """A class decorator that caches the boto3 client within a instance of a
-    boto3 facade object"""
+    def _stub(self, obj, method, value):
+        """Wrap the value to be returned, to check for its calls."""
 
-    def decorator(cls):
+        def call(*args, **kwargs):
+            """Return the value monkeypatched for this method, track call."""
+            self.stubbed[obj][method].append({'args': args, 'kwargs': kwargs})
+            return value(*args, **kwargs)
 
-        def get_client(self):
-            if not hasattr(get_client, 'cached_client'):
-                get_client.cached_client = get_session().client(service)
-            return get_client.cached_client
-
-        cls.client = property(get_client)
-        return cls
-
-    return decorator
-
-
-def cached_resource(service):
-    """A class decorator that caches boto3 resources within a instance of a
-    boto3 facade object"""
-
-    def decorator(cls):
-
-        def get_resource(self):
-            if not hasattr(get_resource, 'cached_resource'):
-                try:
-                    get_resource.cached_resource = get_session().resource(
-                        service)
-                except DataNotFoundError:
-                    get_resource.cached_resource = None
-            return get_resource.cached_resource
-
-        cls.resource = property(get_resource)
-        return cls
-
-    return decorator
+        self.stubbed[obj][method] = []  # new stub: reset calls, if any
+        self.monkeypatch.setattr(obj, method, call)
 
 
 def unroll_tags(tags):

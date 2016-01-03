@@ -4,6 +4,7 @@
 import pytest
 import uuid
 import boto3facade.redshift as rs
+import boto3facade.ec2 as ec2
 from collections import namedtuple
 
 
@@ -25,8 +26,15 @@ def local_creds(scope='module'):
     yield LocalCredentials(key_id, secret_key)
 
 
-def test_make_copy_s3_temp_credentials(temp_creds):
-    creds = rs.make_copy_s3_credentials(temp_creds)
+@pytest.fixture(scope='module')
+def redshift():
+    return rs.Redshift()
+
+
+def test_get_temp_copy_credentials(redshift, monkeypatch, temp_creds):
+    monkeypatch.setattr(ec2, 'get_temporary_credentials',
+                        lambda: temp_creds)
+    creds = redshift.get_copy_credentials()
     assert creds == (
         "aws_access_key_id={};"
         "aws_secret_access_key={};"
@@ -34,12 +42,10 @@ def test_make_copy_s3_temp_credentials(temp_creds):
                            temp_creds.token)
 
 
-def test_make_copy_s3_local_credentials(local_creds):
-    creds = rs.make_copy_s3_credentials(local_creds)
+def test_get_local_copy_credentials(redshift, monkeypatch, local_creds):
+    monkeypatch.setattr('boto3facade.ec2.get_temporary_credentials',
+                        lambda: None)
+    monkeypatch.setattr(redshift, 'get_credentials', lambda: local_creds)
+    creds = redshift.get_copy_credentials()
     assert creds == "aws_access_key_id={};aws_secret_access_key={}".format(
         local_creds.key_id, local_creds.secret_key)
-
-
-def test_get_cluster_by_tag():
-    pass
-

@@ -13,3 +13,18 @@ class LoggedException(Exception):
 class CredentialsError(LoggedException):
     """Unable to retrieve credentials for some service"""
     pass
+
+
+class ProfileNotFoundError(LoggedException):
+    """The specified profile could not be found in the local config files"""
+    pass
+
+
+class InitError(LoggedException):
+    """Error initializing a proxy object"""
+    pass
+
+
+class InvalidInstanceMetadataFieldError(LoggedException):
+    """Trying to retrieve an invalid instance metadata field"""
+    pass
