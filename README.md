@@ -14,8 +14,16 @@ components of projects that use boto3.
 
 ## Installation
 
+To install the development version:
+
 ```
     pip install git+https://github.com/InnovativeTravel/boto3facade
+```
+
+To install the latest stable release:
+
+```
+    pip install boto3facade
 ```
 
 
