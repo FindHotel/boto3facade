@@ -10,8 +10,7 @@ from configparser import ConfigParser
 from collections import namedtuple
 import boto3facade.utils as utils
 from boto3facade.config import Config
-from boto3facade.exceptions import (CredentialsError, ProfileNotFoundError,
-                                    InitError)
+from boto3facade.exceptions import CredentialsError
 from boto3.session import Session
 
 
@@ -20,30 +19,9 @@ Credentials = namedtuple('Credentials', 'key_id secret_key')
 
 class AwsFacade():
     """Common facade functionality across AWS service facades"""
-    def __init__(self, profile=None, profile_name=None, config_file=None,
-                 logger=None):
+    def __init__(self, logger=None, **kwargs):
         """Initializes the proxy object configuration object"""
-        self.config = Config(config_file=config_file)
-
-        if profile_name is None:
-            # There must be a profile associated to a keyring
-            self.profile_name = self.config.get('default', 'profile')
-        else:
-            self.profile_name = profile_name
-
-        if profile is None:
-            # Either the user passes the profile as a dict, or must be read
-            # from the config file.
-            try:
-                self.profile = self.config.get_profile(self.profile_name)
-            except ProfileNotFoundError:
-                self.config.initialize_profile(self.profile_name)
-                self.profile = self.config.get_profile(self.profile_name)
-        elif profile_name is None:
-            raise InitError("You must provide parameter 'profile_name' when "
-                            "providing a 'profile'")
-        else:
-            self.profile = profile
+        self.config = Config(logger=logger, **kwargs)
 
         if logger is None:
             logger_name = "boto3facade.{}".format(self.service)
@@ -63,11 +41,11 @@ class AwsFacade():
     @property
     def session(self):
         if self.__session is None:
-            aws_profile = self.profile.get('aws_profile')
+            aws_profile = self.config.profile.get('aws_profile')
             if aws_profile == '' or aws_profile == 'default':
                 # Use the default creds for this system (maybe temporary
                 # creds from a role)
-                aws_region = self.profile.get('aws_region')
+                aws_region = self.config.profile.get('aws_region')
                 if aws_region:
                     # Region specified in the boto3facade profile.
                     self.__session = Session(region_name=aws_region)
@@ -76,7 +54,7 @@ class AwsFacade():
                     self.__session = Session()
             else:
                 self.__session = Session(
-                    profile_name=self.profile.get('aws_profile'))
+                    profile_name=self.config.profile.get('aws_profile'))
         return self.__session
 
     @property
@@ -134,12 +112,13 @@ class AwsFacade():
             cfg = ConfigParser()
             cfg.read(aws_creds_ini)
             profiles = cfg.sections()
-            if self.profile_name not in profiles:
+            if self.config.active_profile not in profiles:
                 msg = ("No credentials for profile {} could be found in "
-                       "~/.aws/credentials").format(self.profile_name)
+                       "~/.aws/credentials").format(self.config.active_profile)
                 raise CredentialsError(msg)
-            key_id = cfg[self.profile_name]['aws_access_key_id']
-            secret_key = cfg[self.profile_name]['aws_secret_access_key']
+            aws_profile = self.config.profile.get('aws_profile')
+            key_id = cfg[aws_profile]['aws_access_key_id']
+            secret_key = cfg[aws_profile]['aws_secret_access_key']
 
         if key_id is not None:
             return Credentials(key_id, secret_key)

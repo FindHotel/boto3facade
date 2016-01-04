@@ -15,7 +15,7 @@ def ec2(scope='module'):
 
 @pytest.fixture
 def ec2_without_creds(scope='module'):
-    return Ec2(profile_name='test')
+    return Ec2(active_profile='test')
 
 
 def test_get_credentials(ec2):

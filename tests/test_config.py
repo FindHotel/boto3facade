@@ -14,7 +14,7 @@ from boto3facade.exceptions import InvalidConfiguration
 
 @pytest.fixture
 def config(scope='module'):
-    return Ec2(profile_name='test').config
+    return Ec2(active_profile='test').config
 
 
 @pytest.yield_fixture
@@ -51,7 +51,7 @@ def custom_profile(scope='module'):
 
 @pytest.fixture
 def ec2_config(custom_config_file, custom_profile, scope='module'):
-    return Ec2(profile_name=custom_profile,
+    return Ec2(active_profile=custom_profile,
                config_file=custom_config_file).config
 
 
