@@ -4,7 +4,7 @@
 
 # install all needed for development
 develop: .env
-	.env/bin/pip install -e . tox
+	.env/bin/pip install -r requirements.txt -e . tox
 
 test: develop
 	python setup.py test

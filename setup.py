@@ -4,11 +4,18 @@
 
 from setuptools import setup, find_packages
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
+
 
 setup(
     name='boto3facade',
     packages=find_packages(),
-    version='0.1',
+    version='0.2',
+    long_description=long_description,
     # To integrate py.test with setuptools
     setup_requires=['pytest-runner'],
     classifiers=[
