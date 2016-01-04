@@ -4,6 +4,7 @@
 
 import pytest
 import boto3facade.s3
+from botocore.exceptions import ClientError
 import tempfile
 import os
 import uuid
@@ -42,3 +43,9 @@ def test_boto3_client_method(s3, s3bucket):
 
 def test_cp(s3, local_file, s3bucket, s3key):
     s3.cp(local_file, s3bucket, s3key)
+
+
+def test_cp_invalid_bucket(s3, local_file, s3key):
+    s3bucket = str(uuid.uuid4())
+    with pytest.raises(ClientError):
+        s3.cp(local_file, s3bucket, s3key)

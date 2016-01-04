@@ -33,8 +33,3 @@ class InvalidConfiguration(LoggedException):
 class InvalidInstanceMetadataFieldError(LoggedException):
     """Trying to retrieve an invalid instance metadata field"""
     pass
-
-
-class ClientError(LoggedException):
-    """An error when calling a method of a boto3 client"""
-    pass

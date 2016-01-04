@@ -5,6 +5,18 @@
 import inflection
 
 
+def log_exception(exception):
+    def log_exception_decorator(func):
+        def func_wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except exception:
+                self.logger.error(exception)
+                raise
+        return func_wrapper
+    return log_exception_decorator
+
+
 def unroll_tags(tags):
     """Unrolls the tag list of a resource into a dictionary"""
     return {tag['Key']: tag['Value'] for tag in tags}
