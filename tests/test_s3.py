@@ -36,8 +36,8 @@ def s3key(s3, s3bucket):
     s3.client.delete_object(Bucket=s3bucket, Key=key)
 
 
-def test_boto3_client_method(s3):
-    s3.client.list_buckets()
+def test_boto3_client_method(s3, s3bucket):
+    s3.client.get_bucket_acl(Bucket=s3bucket)
 
 
 def test_cp(s3, local_file, s3bucket, s3key):
