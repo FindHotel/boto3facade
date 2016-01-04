@@ -5,35 +5,6 @@
 import inflection
 
 
-class Stub():
-    """Stub methods, keep track of calls."""
-
-    def __init__(self, monkeypatch):
-        self.monkeypatch = monkeypatch
-        self.stubbed = {}
-
-    def stub(self, obj, **kwargs):
-        """Stub obj.method to return whatever parameter was passed for method.
-        Usage: stub(datetime.date, today='today')
-        It's possible to stub several methods on the same object at once.
-        """
-        self.stubbed.setdefault(obj, {})
-        for method, val in kwargs.items():
-            self._stub(obj, method, val)
-        return self.stubbed[obj]
-
-    def _stub(self, obj, method, value):
-        """Wrap the value to be returned, to check for its calls."""
-
-        def call(*args, **kwargs):
-            """Return the value monkeypatched for this method, track call."""
-            self.stubbed[obj][method].append({'args': args, 'kwargs': kwargs})
-            return value(*args, **kwargs)
-
-        self.stubbed[obj][method] = []  # new stub: reset calls, if any
-        self.monkeypatch.setattr(obj, method, call)
-
-
 def unroll_tags(tags):
     """Unrolls the tag list of a resource into a dictionary"""
     return {tag['Key']: tag['Value'] for tag in tags}
