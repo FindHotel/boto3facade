@@ -3,6 +3,7 @@
 
 
 from setuptools import setup, find_packages
+import boto3facade.metadata as metadata
 
 try:
     import pypandoc
@@ -14,8 +15,13 @@ except(IOError, ImportError):
 setup(
     name='boto3facade',
     packages=find_packages(),
-    version='0.2',
+    version=metadata.version,
+    description=metadata.description,
     long_description=long_description,
+    author=metadata.authors[0],
+    author_mail=metadata.emails[0],
+    url=metadata.url,
+    license=metadata.license,
     # To integrate py.test with setuptools
     setup_requires=['pytest-runner'],
     classifiers=[
