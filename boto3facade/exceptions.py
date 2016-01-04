@@ -25,6 +25,11 @@ class InitError(LoggedException):
     pass
 
 
+class InvalidConfiguration(LoggedException):
+    """The module configuration has errors"""
+    pass
+
+
 class InvalidInstanceMetadataFieldError(LoggedException):
     """Trying to retrieve an invalid instance metadata field"""
     pass
