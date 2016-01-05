@@ -19,7 +19,7 @@ setup(
     description=metadata.description,
     long_description=long_description,
     author=metadata.authors[0],
-    author_mail=metadata.emails[0],
+    author_email=metadata.emails[0],
     url=metadata.url,
     license=metadata.license,
     # To integrate py.test with setuptools
