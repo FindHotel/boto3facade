@@ -11,7 +11,7 @@ def log_exception(exception):
             try:
                 return func(self, *args, **kwargs)
             except exception:
-                self.logger.error(exception)
+                self.config.logger.error(exception)
                 raise
         return func_wrapper
     return log_exception_decorator

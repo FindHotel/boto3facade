@@ -34,7 +34,7 @@ class Redshift(AwsFacade):
         creds = self.get_credentials()
         if creds is None:
             msg = "Unable to retrieve AWS credentials"
-            raise CredentialsError(msg, logger=self.logger)
+            raise CredentialsError(msg, logger=self.config.logger)
         else:
             return "aws_access_key_id={};aws_secret_access_key={}".format(
                 creds.key_id, creds.secret_key)

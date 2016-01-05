@@ -4,7 +4,6 @@
 
 import abc
 import inflection
-import logging
 import os
 from configparser import ConfigParser
 from collections import namedtuple
@@ -19,15 +18,13 @@ Credentials = namedtuple('Credentials', 'key_id secret_key')
 
 class AwsFacade():
     """Common facade functionality across AWS service facades"""
-    def __init__(self, logger=None, **kwargs):
+    def __init__(self, config=None, **kwargs):
         """Initializes the proxy object configuration object"""
-        self.config = Config(logger=logger, **kwargs)
 
-        if logger is None:
-            logger_name = "boto3facade.{}".format(self.service)
-            self.logger = logging.getLogger(logger_name)
+        if config is None:
+            self.config = Config(**kwargs)
         else:
-            self.logger = logger
+            self.config = config
 
         # To cache boto3 stuff
         self.__session = None

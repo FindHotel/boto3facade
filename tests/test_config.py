@@ -7,6 +7,7 @@ import tempfile
 import configparser
 import os
 from boto3facade.ec2 import Ec2
+from boto3facade.redshift import Redshift
 import boto3facade.config
 from boto3facade.config import Config
 from boto3facade.exceptions import InvalidConfiguration
@@ -53,6 +54,11 @@ def custom_profile(scope='module'):
 def ec2_config(custom_config_file, custom_profile, scope='module'):
     return Ec2(active_profile=custom_profile,
                config_file=custom_config_file).config
+
+
+@pytest.fixture
+def vanilla_config(custom_config_file, scope='module'):
+    return Config(config_file=custom_config_file)
 
 
 @pytest.fixture
@@ -164,3 +170,8 @@ def test_aws_signature_version(custom_config_file, custom_aws_config_file,
     cfg = configparser.ConfigParser()
     cfg.read(custom_aws_config_file)
     assert cfg['default'].get('s3') == '\nsignature_version = s3v4'
+
+
+def test_constructor_with_config_object(vanilla_config):
+    rs = Redshift(config=vanilla_config)
+    assert rs.config.config_file == vanilla_config.config_file
