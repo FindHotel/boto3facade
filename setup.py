@@ -16,6 +16,7 @@ setup(
     name='boto3facade',
     packages=find_packages(),
     version=metadata.version,
+    package_data={'': ['*.ini']},
     description=metadata.description,
     long_description=long_description,
     author=metadata.authors[0],
