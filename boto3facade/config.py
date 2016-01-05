@@ -19,10 +19,10 @@ DEFAULT_ENV_PREFIX = 'BOTO3_'
 DEFAULT_ACTIVE_PROFILE = 'default'
 DEFAULT_LOGGER = logging.getLogger(__name__)
 # The configuration keys that will be configured with Config.configure
-DEFAULT_KEYS = ['kms_key_id', 'bucket', 'namespace', 'aws_profile']
+DEFAULT_KEYS = ['bucket', 'aws_profile']
 DEFAULT_REQUIRED_KEYS = ['aws_profile']
 # Fallback values for some configuration options
-DEFAULT_FALLBACK = {'namespace': 'default'}
+DEFAULT_FALLBACK = {}
 
 
 class Config:
