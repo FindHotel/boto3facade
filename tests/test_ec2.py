@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import uuid
 import os
 from boto3facade.ec2 import (TemporaryCredentials,
                              get_temporary_credentials)
@@ -11,17 +10,7 @@ from collections import namedtuple
 import time
 
 
-@pytest.yield_fixture(scope="module")
-def randomstr():
-    yield str(uuid.uuid4())
-
-
-@pytest.yield_fixture(scope='module')
-def ec2resource(ec2):
-    yield ec2.resource
-
-
-@pytest.yield_fixture(scope="module")
+@pytest.yield_fixture(scope="function")
 def testvpc(randomstr, ec2client, ec2resource):
     resp = ec2client.create_vpc(CidrBlock='10.49.0.0/16')
     vpcid = resp['Vpc']['VpcId']
@@ -36,7 +25,7 @@ def testvpc(randomstr, ec2client, ec2resource):
         ec2client.delete_vpc(VpcId=vpcid)
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.yield_fixture(scope="function")
 def testsg(randomstr, ec2client, ec2resource, testvpc):
     resp = ec2client.create_security_group(
         GroupName=randomstr, Description='test group (delete me!)',
@@ -48,7 +37,7 @@ def testsg(randomstr, ec2client, ec2resource, testvpc):
     ec2client.delete_security_group(GroupId=sg.id)
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.yield_fixture(scope="function")
 def testsubnet(randomstr, ec2client, ec2resource, testvpc):
     resp = ec2client.create_subnet(
         VpcId=testvpc.id,
@@ -60,7 +49,7 @@ def testsubnet(randomstr, ec2client, ec2resource, testvpc):
     ec2client.delete_subnet(SubnetId=subnetid)
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.yield_fixture(scope="function")
 def testkeypair(randomstr, ec2):
     keyname = 'test-' + randomstr
     yield keyname

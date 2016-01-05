@@ -48,13 +48,13 @@ def ec2(random_file_path, random_dir_path):
     return obj
 
 
-@pytest.yield_fixture(scope='module')
+@pytest.yield_fixture(scope='function')
 def ec2client(ec2):
     """A boto3 EC2 client object"""
     yield ec2.client
 
 
-@pytest.yield_fixture(scope='module')
+@pytest.yield_fixture(scope='function')
 def ec2resource(ec2):
     """A boto3 EC2 resource object"""
     yield ec2.resource
