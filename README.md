@@ -34,11 +34,11 @@ implements the facade to [AWS EC2 service][ec2]. Each of these modules
 typically contain just one class, named as the corresponding AWS service. E.g.
 the `boto3facade.ec2` module contains an `Ec2` class. In some cases, there may
 also be public module functions that implement utilities that don't require
-access to the [AWS boto3][boto3] SDK. For instance in the EC2 facade:
+access to the [AWS boto3 SDK][boto3]. For instance in the EC2 facade:
 
 [ec2]: https://aws.amazon.com/ec2/
 
-```
+```python
 import boto3facade.ec2 as ec2
 
 # Get the name of the role associated to the EC2 instance
@@ -52,7 +52,7 @@ else:
 Facade methods that actually use the `boto3` are implemented as instance
 methods:
 
-```
+```python
 from boto3facade.ec2 import Ec2
 
 # Create the facade object
