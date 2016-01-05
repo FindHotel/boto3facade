@@ -3,7 +3,8 @@
 
 import pytest
 import uuid
-from boto3facade.ec2 import (Ec2, TemporaryCredentials,
+import os
+from boto3facade.ec2 import (TemporaryCredentials,
                              get_temporary_credentials)
 from botocore.exceptions import ClientError
 from collections import namedtuple
@@ -13,16 +14,6 @@ import time
 @pytest.yield_fixture(scope="module")
 def randomstr():
     yield str(uuid.uuid4())
-
-
-@pytest.yield_fixture(scope="module")
-def ec2():
-    yield Ec2()
-
-
-@pytest.yield_fixture(scope='module')
-def ec2client(ec2):
-    yield ec2.client
 
 
 @pytest.yield_fixture(scope='module')
@@ -67,6 +58,17 @@ def testsubnet(randomstr, ec2client, ec2resource, testvpc):
     subnet.create_tags(Tags=[{'Key': 'Name', 'Value': randomstr}])
     yield subnet
     ec2client.delete_subnet(SubnetId=subnetid)
+
+
+@pytest.yield_fixture(scope="module")
+def testkeypair(randomstr, ec2):
+    keyname = 'test-' + randomstr
+    yield keyname
+    ec2.delete_key_pair(keyname)
+    local_key = os.path.join(ec2.config.profile.get('keys_dir'),
+                             randomstr)
+    if os.path.isfile(local_key):
+        os.remove(local_key)
 
 
 def test_get_ami_by_tag_no_match(ec2, randomstr):
@@ -140,3 +142,12 @@ def test_get_temporary_credentials_outside_ec2(monkeypatch):
     monkeypatch.setattr('boto3facade.ec2.in_ec2', lambda: False)
     creds = get_temporary_credentials()
     assert creds is None
+
+
+def test_key_pairs(ec2, testkeypair):
+    assert not ec2.key_pair_exists(testkeypair)
+    keypair = ec2.create_key_pair(testkeypair)
+    assert type(keypair).__name__ == 'ec2.KeyPairInfo'
+    keysdir = os.path.expanduser(ec2.config.profile['keys_dir'])
+    local_key = os.path.join(keysdir, testkeypair)
+    assert os.path.isfile(local_key)

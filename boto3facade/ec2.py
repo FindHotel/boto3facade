@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+from __future__ import print_function
 import json
+import os
 import logging
 import boto3facade.utils as utils
 from boto3facade.iam import Iam
@@ -114,3 +116,49 @@ class Ec2(AwsFacade):
         """Produces a SecurityGroup object that matches the requested name"""
         props = {'GroupName': name}
         return self.filter_resource_by_property('SecurityGroup', props)
+
+    def delete_key_pair(self, keyname):
+        """Deletes an keypair in AWS EC2"""
+        if self.key_pair_exists(keyname):
+            self.client.delete_key_pair(KeyName=keyname)
+            return True
+        else:
+            msg = "Keypair {} does not exist: nothing done"
+            self.config.logger.warning(msg)
+            return False
+
+    def create_key_pair(self, keyname):
+        """Creates a keypair in AWS EC2, if it doesn't exist already"""
+        if not self.key_pair_exists(keyname):
+            resp = self.client.create_key_pair(KeyName=keyname)
+            keypair = self.resource.KeyPair(resp['KeyName'])
+            self._save_key_pair(resp)
+            return keypair
+        else:
+            msg = "Keypair {} already exists: not creating".format(keyname)
+            self.config.logger.warning(msg)
+
+    def _save_key_pair(self, keypair):
+        """Saves an AWS keypair to a local directory"""
+        target_dir = self.config.profile.get('keys_dir', os.path.curdir)
+        target_dir = os.path.expanduser(target_dir)
+        key_name = keypair['KeyName']
+        target_file = os.path.join(target_dir, key_name)
+        msg = "Saving AWS Key '{}' locally: {}".format(key_name,
+                                                       target_file)
+        self.config.logger.info(msg)
+
+        if os.path.isfile(target_file):
+            msg = "File {} already exists: NOT saving key".format(key_name)
+            self.config.logger.info(msg)
+
+        with open(target_file, 'a') as f:
+            print(keypair['KeyMaterial'], file=f)
+
+        return target_file
+
+    def key_pair_exists(self, key_name):
+        """Returns True if a key exists in AWS"""
+        return key_name in [
+            k['KeyName'] for k
+            in self.client.describe_key_pairs().get('KeyPairs')]

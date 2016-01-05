@@ -24,14 +24,6 @@ def dummyparam(config, scope='module'):
     config.config.remove_option('default', 'dummyparam')
 
 
-@pytest.yield_fixture
-def custom_config_file(scope='function'):
-    filename = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-    yield filename
-    if os.path.isfile(filename):
-        os.remove(filename)
-
-
 @pytest.fixture
 def custom_aws_config_dir(scope='module'):
     return tempfile.gettempdir()
@@ -51,14 +43,14 @@ def custom_profile(scope='module'):
 
 
 @pytest.fixture
-def ec2_config(custom_config_file, custom_profile, scope='module'):
+def ec2_config(random_file_path, custom_profile, scope='module'):
     return Ec2(active_profile=custom_profile,
-               config_file=custom_config_file).config
+               config_file=random_file_path).config
 
 
 @pytest.fixture
-def vanilla_config(custom_config_file, scope='module'):
-    return Config(config_file=custom_config_file)
+def vanilla_config(random_file_path, scope='module'):
+    return Config(config_file=random_file_path)
 
 
 @pytest.fixture
@@ -97,12 +89,12 @@ def test_write_config(config, dummyparam):
     assert config.get('default', dummyparam) == dummyvalue
 
 
-def test_read_ec2_config(ec2_config, custom_config_file):
+def test_read_ec2_config(ec2_config, random_file_path):
     """Reads a parameter from a custom config file"""
     profile_name = ec2_config.get('default', 'profile')
     assert profile_name == 'default'
-    assert ec2_config.config_file == custom_config_file
-    assert os.path.isfile(custom_config_file)
+    assert ec2_config.config_file == random_file_path
+    assert os.path.isfile(random_file_path)
 
 
 def test_write_config_in_ec2_config(ec2_config, dummyparam, config):
@@ -117,26 +109,26 @@ def test_write_config_in_ec2_config(ec2_config, dummyparam, config):
 
 
 def test_constructor_ifc(custom_env_prefix, custom_profile, custom_keys,
-                         custom_fallback, custom_config_file):
+                         custom_fallback, random_file_path):
 
     config = Config(
         env_prefix=custom_env_prefix,
-        config_file=custom_config_file,
+        config_file=random_file_path,
         active_profile=custom_profile,
         keys=custom_keys,
         required_keys=custom_keys,
         fallback=custom_fallback)
     assert config.env_prefix == custom_env_prefix
-    assert config.config_file == custom_config_file
+    assert config.config_file == random_file_path
     assert config.active_profile == custom_profile
     assert config.keys == custom_keys
     assert config.required_keys == custom_keys
     assert config.fallback == custom_fallback
 
 
-def test_invalid_configuration(custom_keys, custom_config_file):
+def test_invalid_configuration(custom_keys, random_file_path):
     config = Config(
-        config_file=custom_config_file,
+        config_file=random_file_path,
         keys=custom_keys,
         required_keys=custom_keys)
     with pytest.raises(InvalidConfiguration):
@@ -144,10 +136,10 @@ def test_invalid_configuration(custom_keys, custom_config_file):
 
 
 def test_configure_with_envvars(custom_env_prefix, custom_keys, custom_values,
-                                custom_config_file, monkeypatch):
+                                random_file_path, monkeypatch):
     config = Config(
         env_prefix=custom_env_prefix,
-        config_file=custom_config_file,
+        config_file=random_file_path,
         keys=custom_keys,
         required_keys=custom_keys)
 
@@ -158,7 +150,7 @@ def test_configure_with_envvars(custom_env_prefix, custom_keys, custom_values,
     config.configure(ask=False)
 
 
-def test_aws_signature_version(custom_config_file, custom_aws_config_file,
+def test_aws_signature_version(random_file_path, custom_aws_config_file,
                                custom_aws_config_dir, monkeypatch):
     monkeypatch.setattr(boto3facade.config, 'AWS_CONFIG_DIR',
                         custom_aws_config_dir)
