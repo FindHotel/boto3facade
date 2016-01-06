@@ -40,4 +40,5 @@ setup(
         'mock>=1.0.1',
         'flake8>=2.1.0'
     ],
+    zip_safe=False
 )
