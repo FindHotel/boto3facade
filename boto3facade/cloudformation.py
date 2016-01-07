@@ -3,7 +3,7 @@
 
 
 from boto3facade.aws import AwsFacade
-from exceptions import AwsError
+from boto3facade.exceptions import AwsError
 import boto3facade.utils as utils
 import time
 
