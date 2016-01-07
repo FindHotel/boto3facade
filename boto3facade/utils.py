@@ -17,6 +17,11 @@ def log_exception(exception):
     return log_exception_decorator
 
 
+def roll_tags(tags):
+    """Rolls a dictionary of tags into a list of tags Key/Value dicts"""
+    return [{'Key': k, 'Value': v} for k, v in tags.items()]
+
+
 def unroll_tags(tags):
     """Unrolls the tag list of a resource into a dictionary"""
     return {tag['Key']: tag['Value'] for tag in tags}

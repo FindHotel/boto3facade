@@ -10,7 +10,7 @@ import logging
 from boto3facade.exceptions import ProfileNotFoundError, InvalidConfiguration
 
 
-AWS_CONFIG_DIR = os.path.join(os.path.expanduser('~'), '.aws')
+AWS_CONFIG_DIR = os.path.expanduser('~/.aws')
 AWS_CONFIG_FILE = os.path.join(AWS_CONFIG_DIR, 'config')
 
 # Defaults for the Config constructor

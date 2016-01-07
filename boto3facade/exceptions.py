@@ -33,3 +33,8 @@ class InvalidConfiguration(LoggedException):
 class InvalidInstanceMetadataFieldError(LoggedException):
     """Trying to retrieve an invalid instance metadata field"""
     pass
+
+
+class AwsError(LoggedException):
+    """An error produced by AWS."""
+    pass
