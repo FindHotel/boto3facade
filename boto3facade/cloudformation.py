@@ -43,7 +43,7 @@ class Cloudformation(AwsFacade):
                 {'DELETE_COMPLETE', 'DELETE_IN_PROGRESS'}:
             stack_status = ('not in CF', stack_status)[stack_status is None]
             msg = "Stack {} is {}: skipping".format(stack_name, stack_status)
-            self.logger.info(msg)
+            self.config.logger.info(msg)
             return
 
         self.client.delete_stack(StackName=stack_name)
@@ -53,7 +53,7 @@ class Cloudformation(AwsFacade):
         if stack_status and stack_status.find('FAILED') > -1:
             msg = "Failed to delete stack {}. Stack status is {}.".format(
                 stack_name, stack_status)
-            raise AwsError(msg, logger=self.logger)
+            raise AwsError(msg, logger=self.config.logger)
 
     def create_stack(self, stack_name, template_body, notification_arns, tags,
                      wait=False):
@@ -62,7 +62,7 @@ class Cloudformation(AwsFacade):
         if stack_status in {'CREATE_COMPLETE', 'CREATE_IN_PROGRESS'}:
             msg = "Stack {} already in status {}: skipping".format(
                 stack_name, stack_status)
-            self.logger.info(msg)
+            self.config.logger.info(msg)
             self.wait_for_status_change(stack_name, 'CREATE_IN_PROGRESS')
             return
 
@@ -78,7 +78,7 @@ class Cloudformation(AwsFacade):
         if stack_status.find('FAILED') > -1:
             msg = "Failed to create stack {}. Stack status is {}.".format(
                 stack_name, stack_status)
-            raise AwsError(msg, logger=self.logger)
+            raise AwsError(msg, logger=self.config.logger)
 
     def stack_exists(self, stack_name):
         """Checks whether a stack exists in CF"""
@@ -106,7 +106,7 @@ class Cloudformation(AwsFacade):
                     stack_name=stack_name,
                     nb_seconds=nb_seconds,
                     status=status)
-                raise AwsError(msg, logger=self.logger)
+                raise AwsError(msg, logger=self.config.logger)
 
     def get_stack(self, stack_name):
         """Retrieves a stack object using the stack name"""
