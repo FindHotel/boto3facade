@@ -18,4 +18,4 @@ class Iam(AwsFacade):
         pinfo = [p for p in profiles if p['InstanceProfileId'] == profile_id]
         if len(pinfo) < 1:
             return
-        return self.resource.InstanceProfile(pinfo['InstanceProfileName'])
+        return self.resource.InstanceProfile(pinfo[0]['InstanceProfileName'])
