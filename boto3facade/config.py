@@ -125,8 +125,13 @@ class Config:
             msg = "Options {} are required".format(missing_options)
             return False, msg
 
+    def activate_profile(self, profile_name):
+        """Activates a named profile."""
+        self.active_profile = profile_name
+        self.load()
+
     def load(self):
-        """Load configuration from ini file"""
+        """Load configuration from ini file."""
         self.config.read(self.config_file)
         self.profile = self.get_profile(self.active_profile)
 
