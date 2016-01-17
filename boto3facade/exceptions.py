@@ -38,3 +38,8 @@ class InvalidInstanceMetadataFieldError(LoggedException):
 class AwsError(LoggedException):
     """An error produced by AWS."""
     pass
+
+
+class NoUpdatesError(LoggedException):
+    """No updates to be performed in a CF stack."""
+    pass

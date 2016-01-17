@@ -7,7 +7,7 @@ import time
 from botocore.exceptions import ClientError
 
 from boto3facade.aws import AwsFacade
-from boto3facade.exceptions import AwsError
+from boto3facade.exceptions import AwsError, NoUpdatesError
 import boto3facade.utils as utils
 
 
@@ -94,13 +94,13 @@ class Cloudformation(AwsFacade):
                 Capabilities=['CAPABILITY_IAM'],
                 NotificationARNs=notification_arns)
         except ClientError as error:
-            message = error.response.get('Error', {}).get('Message')
+            msg = error.response.get('Error', {}).get('Message').lower()
             code = error.response.get('Error', {}).get('Code')
-            if not (code == 'ValidationError' and
-                    message.lower().find('no updates') > -1):
-                    # We don't consider no updates an error
+            if (code == 'ValidationError' and msg.find('no updates') > -1):
+                # Translate into a higher-level exception
                 msg = "No updates are to be performed: {}".format(error)
-                self.config.logger.info(msg)
+                raise NoUpdatesError(msg)
+            else:
                 raise
 
         if wait:
