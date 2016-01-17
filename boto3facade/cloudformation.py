@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
+import time
+
+from botocore.exceptions import ClientError
+
 from boto3facade.aws import AwsFacade
 from boto3facade.exceptions import AwsError
 import boto3facade.utils as utils
-import time
 
 
 CF_TIMEOUT = 10*60
@@ -84,11 +87,22 @@ class Cloudformation(AwsFacade):
                      wait=False):
         """Updates an existing stack."""
         stack_status = self.stack_statuses.get(stack_name)
-        self.client.update_stack(
-            StackName=stack_name,
-            TemplateBody=template_body,
-            Capabilities=['CAPABILITY_IAM'],
-            NotificationARNs=notification_arns)
+        try:
+            self.client.update_stack(
+                StackName=stack_name,
+                TemplateBody=template_body,
+                Capabilities=['CAPABILITY_IAM'],
+                NotificationARNs=notification_arns)
+        except ClientError as error:
+            message = error.response.get('Error', {}).get('Message')
+            code = error.response.get('Error', {}).get('Code')
+            if not (code == 'ValidationError' and
+                    message.lower().find('no updates') > -1):
+                    # We don't consider no updates an error
+                msg = "No updates are to be performed: {}".format(error)
+                self.config.logger.info(msg)
+                raise
+
         if wait:
             self.wait_for_status_change(stack_name, 'UPDATE_IN_PROGRESS')
         stack_status = self.stack_statuses.get(stack_name)
