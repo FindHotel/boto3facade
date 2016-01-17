@@ -44,7 +44,7 @@ class Cloudformation(AwsFacade):
         stack_status = self.stack_statuses.get(stack_name)
         if not stack_status or stack_status in \
                 {'DELETE_COMPLETE', 'DELETE_IN_PROGRESS'}:
-            stack_status = ('not in CF', stack_status)[stack_status is None]
+            stack_status = (stack_status, 'not in CF')[stack_status is None]
             msg = "Stack {} is {}: skipping".format(stack_name, stack_status)
             self.config.logger.info(msg)
             return
