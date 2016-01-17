@@ -80,7 +80,7 @@ class Cloudformation(AwsFacade):
                 stack_name, stack_status)
             raise AwsError(msg, logger=self.config.logger)
 
-    def update_stack(self, stack_name, template_body, notification_arns, tags,
+    def update_stack(self, stack_name, template_body, notification_arns,
                      wait=False):
         """Updates an existing stack."""
         stack_status = self.stack_statuses.get(stack_name)
