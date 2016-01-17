@@ -18,7 +18,7 @@ class Cloudformation(AwsFacade):
 
     @property
     def stacks(self):
-        """Produces a list of CF stack description objects"""
+        """Produces a list of CF stack description objects."""
         return self.client.describe_stacks().get('Stacks')
 
     @property
@@ -28,16 +28,16 @@ class Cloudformation(AwsFacade):
 
     @property
     def stack_outputs(self):
-        """Returns a dict with the outputs for every stack in CF"""
+        """Returns a dict with the outputs for every stack in CF."""
         return self._get_stack_property('Outputs')
 
     def _get_stack_property(self, property_name):
-        """Gets the value of certain stack property for every stack in CF"""
+        """Gets the value of certain stack property for every stack in CF."""
         return {s.get('StackName'): s.get(property_name) for s
                 in self.client.describe_stacks().get('Stacks', [])}
 
     def delete_stack(self, stack_name, wait=CF_TIMEOUT):
-        """Deletes a CF stack, if it exists in CF"""
+        """Deletes a CF stack, if it exists in CF."""
         stack_status = self.stack_statuses.get(stack_name)
         if not stack_status or stack_status in \
                 {'DELETE_COMPLETE', 'DELETE_IN_PROGRESS'}:
@@ -57,7 +57,7 @@ class Cloudformation(AwsFacade):
 
     def create_stack(self, stack_name, template_body, notification_arns, tags,
                      wait=False):
-        """Creates a CF stack, unless it already exists"""
+        """Creates a CF stack, unless it already exists."""
         stack_status = self.stack_statuses.get(stack_name)
         if stack_status in {'CREATE_COMPLETE', 'CREATE_IN_PROGRESS'}:
             msg = "Stack {} already in status {}: skipping".format(
@@ -80,12 +80,30 @@ class Cloudformation(AwsFacade):
                 stack_name, stack_status)
             raise AwsError(msg, logger=self.config.logger)
 
+    def update_stack(self, stack_name, template_body, notification_arns, tags,
+                     wait=False):
+        """Updates an existing stack."""
+        stack_status = self.stack_statuses.get(stack_name)
+        self.client.update_stack(
+            StackName=stack_name,
+            TemplateBody=template_body,
+            Capabilities=['CAPABILITY_IAM'],
+            NotificationARNs=notification_arns,
+            Tags=utils.roll_tags(tags))
+        if wait:
+            self.wait_for_status_change(stack_name, 'UPDATE_IN_PROGRESS')
+        stack_status = self.stack_statuses.get(stack_name)
+        if stack_status.find('FAILED') > -1:
+            msg = "Failed to update stack {}. Stack status is {}.".format(
+                stack_name, stack_status)
+            raise AwsError(msg, logger=self.config.logger)
+
     def stack_exists(self, stack_name):
-        """Checks whether a stack exists in CF"""
+        """Checks whether a stack exists in CF."""
         return stack_name in self.stack_statuses
 
     def stack_ok(self, stack_name):
-        """Checks whether a stack is operational"""
+        """Checks whether a stack is operational."""
         return self.stack_exists(stack_name) and \
             self.stack_statuses.get(stack_name) \
             in {'UPDATE_COMPLETE', 'CREATE_COMPLETE'}
@@ -109,38 +127,38 @@ class Cloudformation(AwsFacade):
                 raise AwsError(msg, logger=self.config.logger)
 
     def get_stack(self, stack_name):
-        """Retrieves a stack object using the stack name"""
+        """Retrieves a stack object using the stack name."""
         y = [stack for stack in self.stacks
              if stack['StackName'] == stack_name]
         if len(y) > 0:
             return self.resource.Stack(y[0]['StackName'])
 
     def get_stack_resource(self, stack_name, resource_name):
-        """Retrieves a resource object from a stack"""
+        """Retrieves a resource object from a stack."""
         return [res for res in self.get_stack_resources(stack_name)
                 if res.logical_resource_id == resource_name]
 
     def get_stack_resources(self, stack_name):
-        """Retrieves all resources for a stack"""
+        """Retrieves all resources for a stack."""
         stack = self.get_stack(stack_name)
         return stack.resource_summaries.all()
 
     def get_stack_outputs(self, stack_name):
-        """Retrieves the outputs produced by a Stack"""
+        """Retrieves the outputs produced by a Stack."""
         stack = self.get_stack(stack_name)
         return {o['OutputKey']: o['OutputValue'] for o in stack.outputs}
 
     def get_stack_output(self, stack_name, output_name):
-        """Retrieves one stack output"""
+        """Retrieves one stack output."""
         return [v for k, v in self.get_stack_outputs(stack_name).items()
                 if k == output_name]
 
     def get_stack_status(self, stack_name):
-        """Gets the current status of a CF stack"""
+        """Gets the current status of a CF stack."""
         stack = self.get_stack(stack_name)
         return stack.stack_status
 
     def get_stack_events(self, stack_name):
-        """Gets a list of stack events sorted by timestamp"""
+        """Gets a list of stack events sorted by timestamp."""
         stack = self.get_stack(stack_name)
         return sorted(stack.events.all(), key=lambda ev: ev.timestamp)
