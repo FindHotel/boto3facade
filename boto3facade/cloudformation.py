@@ -88,8 +88,7 @@ class Cloudformation(AwsFacade):
             StackName=stack_name,
             TemplateBody=template_body,
             Capabilities=['CAPABILITY_IAM'],
-            NotificationARNs=notification_arns,
-            Tags=utils.roll_tags(tags))
+            NotificationARNs=notification_arns)
         if wait:
             self.wait_for_status_change(stack_name, 'UPDATE_IN_PROGRESS')
         stack_status = self.stack_statuses.get(stack_name)
