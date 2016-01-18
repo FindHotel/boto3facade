@@ -61,7 +61,8 @@ class Config:
         :param local: If True will write config to a local config file.
         """
         if local:
-            local_file = os.path.join(os.path.curdir, '.humilis.ini')
+            filename = os.path.basename(self.config_file)
+            local_file = os.path.join(os.path.curdir, filename)
             if not os.path.isfile(local_file):
                 shutil.copyfile(self.config_file, local_file)
             self.config_file = local_file

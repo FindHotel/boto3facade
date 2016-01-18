@@ -136,6 +136,8 @@ def test_configure_local_file(configured_config, monkeypatch):
     configured_config.configure(ask=False, local=True)
     assert orig_file != configured_config.config_file
     assert os.path.dirname(configured_config.config_file) == dirpath
+    orig_basename = os.path.basename(orig_file)
+    assert os.path.basename(configured_config.config_file) ==  orig_basename
     # cleanup
     shutil.rmtree(dirpath)
 
