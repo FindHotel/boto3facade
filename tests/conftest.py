@@ -6,11 +6,14 @@
 pytest fixtures shared across test modules
 """
 
-import pytest
-import shutil
 import os
-import uuid
+import shutil
 import tempfile
+
+import pytest
+import uuid
+
+import boto3facade.config
 from boto3facade.ec2 import Ec2
 
 
@@ -46,6 +49,38 @@ def ec2(random_file_path, random_dir_path):
     obj.config.set_profile_option(obj.config.active_profile, 'keys_dir',
                                   random_dir_path)
     return obj
+
+
+@pytest.fixture
+def custom_keys(scope='module'):
+    return [str(uuid.uuid4()) for _ in range(5)]
+
+
+@pytest.fixture
+def custom_values(custom_keys, scope='module'):
+    return [str(uuid.uuid4()) for _ in range(len(custom_keys))]
+
+
+@pytest.fixture(scope="function")
+def blank_config(custom_env_prefix, custom_keys, custom_values,
+                 random_file_path):
+    """A boto3facace.config object."""
+    return boto3facade.config.Config(
+        env_prefix=custom_env_prefix,
+        config_file=random_file_path,
+        keys=custom_keys,
+        required_keys=custom_keys)
+
+
+@pytest.fixture(scope="function")
+def configured_config(blank_config, custom_env_prefix, custom_keys,
+                      custom_values, monkeypatch):
+    # Mock the environment
+    for k, v in zip(custom_keys, custom_values):
+        varname = "{}{}".format(custom_env_prefix, k.upper())
+        monkeypatch.setitem(os.environ, varname, v)
+    blank_config.configure(ask=False)
+    return blank_config
 
 
 @pytest.yield_fixture(scope='function')

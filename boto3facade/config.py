@@ -54,8 +54,18 @@ class Config:
         self.config = configparser.ConfigParser()
         self.load()
 
-    def configure(self, ask=True, **kwargs):
-        """Configures the keyring, requesting user input if necessary"""
+    def configure(self, ask=True, local=False, **kwargs):
+        """Configures boto3facade.
+
+        :param ask: If set to False will not ask anything to the user.
+        :param local: If True will write config to a local config file.
+        """
+        if local:
+            local_file = os.path.join(os.path.curdir, '.humilis.ini')
+            if not os.path.isfile(local_file):
+                shutil.copyfile(self.config_file, local_file)
+            self.config_file = local_file
+            self.load()
         fallback = self.fallback
         for option in self.keys:
             value = kwargs.get(option) or \

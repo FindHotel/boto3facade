@@ -3,6 +3,7 @@
 
 import pytest
 import uuid
+import shutil
 import tempfile
 import configparser
 import os
@@ -51,16 +52,6 @@ def ec2_config(random_file_path, custom_profile, scope='module'):
 @pytest.fixture
 def vanilla_config(random_file_path, scope='module'):
     return Config(config_file=random_file_path)
-
-
-@pytest.fixture
-def custom_keys(scope='module'):
-    return [str(uuid.uuid4()) for _ in range(5)]
-
-
-@pytest.fixture
-def custom_values(custom_keys, scope='module'):
-    return [str(uuid.uuid4()) for _ in range(len(custom_keys))]
 
 
 @pytest.fixture
@@ -126,31 +117,30 @@ def test_constructor_ifc(custom_env_prefix, custom_profile, custom_keys,
     assert config.fallback == custom_fallback
 
 
-def test_invalid_configuration(custom_keys, random_file_path):
-    config = Config(
-        config_file=random_file_path,
-        keys=custom_keys,
-        required_keys=custom_keys)
+def test_invalid_configuration(blank_config):
     with pytest.raises(InvalidConfiguration):
-        config.configure(ask=False)
+        blank_config.configure(ask=False)
 
 
-def test_configure_with_envvars(custom_env_prefix, custom_keys, custom_values,
-                                random_file_path, monkeypatch):
-    config = Config(
-        env_prefix=custom_env_prefix,
-        config_file=random_file_path,
-        keys=custom_keys,
-        required_keys=custom_keys)
-
-    # Mock the environment
-    for k, v in zip(custom_keys, custom_values):
-        varname = "{}{}".format(custom_env_prefix, k.upper())
-        monkeypatch.setitem(os.environ, varname, v)
-    config.configure(ask=False)
+def test_configure_with_envvars(blank_config):
+    # If the fixture ran without errors then we are already good
+    pass
 
 
-def test_aws_signature_version(random_file_path, custom_aws_config_file,
+def test_configure_local_file(configured_config, monkeypatch):
+    # Create a fake home dir
+    dirpath = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
+    os.mkdir(dirpath)
+    monkeypatch.setattr(os.path, 'curdir', dirpath)
+    orig_file = configured_config.config_file
+    configured_config.configure(ask=False, local=True)
+    assert orig_file != configured_config.config_file
+    assert os.path.dirname(configured_config.config_file) == dirpath
+    # cleanup
+    shutil.rmtree(dirpath)
+
+
+def test_aws_signature_version(custom_aws_config_file,
                                custom_aws_config_dir, monkeypatch):
     monkeypatch.setattr(boto3facade.config, 'AWS_CONFIG_DIR',
                         custom_aws_config_dir)
