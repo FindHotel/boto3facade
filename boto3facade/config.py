@@ -7,7 +7,7 @@ import shutil
 import os
 import boto3facade
 import logging
-from boto3facade.exceptions import ProfileNotFoundError, InvalidConfiguration
+from boto3facade.exceptions import InvalidConfiguration
 
 
 AWS_CONFIG_DIR = os.path.expanduser('~/.aws')
@@ -22,7 +22,7 @@ DEFAULT_LOGGER = logging.getLogger(__name__)
 DEFAULT_KEYS = ['bucket', 'aws_profile', 'keys_dir']
 DEFAULT_REQUIRED_KEYS = ['aws_profile']
 # Fallback values for some configuration options
-DEFAULT_FALLBACK = {}
+DEFAULT_FALLBACK = {'aws_profile': 'default'}
 
 
 class Config:
@@ -164,8 +164,7 @@ class Config:
         """Returns a dict-like object with profile options"""
         section = "profile:{}".format(profile_name)
         if section not in self.config:
-            raise ProfileNotFoundError(
-                "Profile {} not found".format(profile_name))
+            return {k: None for k in DEFAULT_KEYS}
         return self.config[section]
 
     def remove_profile(self, profile_name):
@@ -176,7 +175,11 @@ class Config:
 
     def get_profile_option(self, profile_name, param):
         """Reads a config option for a profile"""
-        return self.get("profile:{}".format(profile_name), param)
+        try:
+            return self.get("profile:{}".format(profile_name), param)
+        except configparser.NoOptionError:
+            # Return None if an option is not found
+            pass
 
     def initialize_profile(self, profile_name):
         """Initializes a profile in the config file"""

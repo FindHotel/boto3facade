@@ -137,7 +137,24 @@ def test_configure_local_file(configured_config, monkeypatch):
     assert orig_file != configured_config.config_file
     assert os.path.dirname(configured_config.config_file) == dirpath
     orig_basename = os.path.basename(orig_file)
-    assert os.path.basename(configured_config.config_file) ==  orig_basename
+    assert os.path.basename(configured_config.config_file) == orig_basename
+    # cleanup
+    shutil.rmtree(dirpath)
+
+
+def test_configure_new_local_profile(configured_config, monkeypatch):
+    # Create a fake home dir
+    dirpath = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
+    os.mkdir(dirpath)
+    monkeypatch.setattr(os.path, 'curdir', dirpath)
+    orig_file = configured_config.config_file
+    profile_name = str(uuid.uuid4())
+    configured_config.activate_profile(profile_name)
+    configured_config.configure(ask=False, local=True)
+    assert orig_file != configured_config.config_file
+    assert os.path.dirname(configured_config.config_file) == dirpath
+    orig_basename = os.path.basename(orig_file)
+    assert os.path.basename(configured_config.config_file) == orig_basename
     # cleanup
     shutil.rmtree(dirpath)
 
