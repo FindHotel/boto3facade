@@ -8,7 +8,7 @@ Information describing the project.
 package = 'boto3facade'
 project = "boto3facade"
 project_no_spaces = project.replace(' ', '')
-version = '0.2.0'
+version = '0.2.1'
 description = 'A simple facade for boto3'
 authors = ['German Gomez-Herrero', 'Innovative Travel Ltd']
 authors_string = ', '.join(authors)
