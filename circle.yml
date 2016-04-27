@@ -1,6 +1,0 @@
-dependencies:
-  pre:
-    - pip install setuptools --upgrade
-machine:
-  python:
-    version: 3.4.2
