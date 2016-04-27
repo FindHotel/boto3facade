@@ -7,7 +7,7 @@ class LoggedException(Exception):
     def __init__(self, msg, logger=None):
         if logger:
             logger.critical(msg)
-        super().__init__(msg)
+        super(LoggedException, self).__init__(msg)
 
 
 class CredentialsError(LoggedException):

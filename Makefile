@@ -1,16 +1,21 @@
+PIP := .env/bin/pip
+TOX := .env/bin/tox
+PYTHON := .env/bin/python
+
 # create virtual environment
 .env:
 	virtualenv .env -p python3
 
 # install all needed for development
 develop: .env
-	.env/bin/pip install -r requirements.txt -e . tox
+	$(PIP) install -r requirements-dev.txt -e .
 
-test: develop
-	python setup.py test
+test: .env
+	$(PIP) install tox
+	$(TOX)
 
 pypi:
-	python setup.py sdist upload
+	$(PYTHON) setup.py sdist upload
 
 # clean the development envrironment
 clean:
