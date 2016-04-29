@@ -25,6 +25,6 @@ def test_get_credentials(ec2):
 
 def test_get_credentials_for_empty_profile(ec2_without_creds, monkeypatch):
 
-    monkeypatch.delenv("AWS_ACCESS_KEY_ID")
+    monkeypatch.delenv("AWS_ACCESS_KEY_ID", raising=False)
     with pytest.raises(CredentialsError):
         ec2_without_creds.get_credentials()
