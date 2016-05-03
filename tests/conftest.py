@@ -1,11 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-
-"""
-pytest fixtures shared across test modules
-"""
-
+"""Global fixtures."""
 import os
 import shutil
 import tempfile

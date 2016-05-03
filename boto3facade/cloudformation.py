@@ -7,7 +7,7 @@ import time
 from botocore.exceptions import ClientError
 
 from boto3facade.aws import AwsFacade
-from boto3facade.exceptions import AwsError, NoUpdatesError
+from boto3facade.exceptions import AwsError, NoUpdatesError, StackNotFoundError
 import boto3facade.utils as utils
 
 
@@ -154,6 +154,9 @@ class Cloudformation(AwsFacade):
     def get_stack_resources(self, stack_name):
         """Retrieves all resources for a stack."""
         stack = self.get_stack(stack_name)
+        if not stack:
+            msg = "Cannot find stack '{}' in CloudFormation".format(stack_name)
+            raise StackNotFoundError(msg)
         return stack.resource_summaries.all()
 
     def get_stack_outputs(self, stack_name):

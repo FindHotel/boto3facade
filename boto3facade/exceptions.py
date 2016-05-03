@@ -43,3 +43,8 @@ class AwsError(LoggedException):
 class NoUpdatesError(LoggedException):
     """No updates to be performed in a CF stack."""
     pass
+
+
+class StackNotFoundError(LoggedException):
+    """Could not find the requested stack in Cloudformation."""
+    pass
