@@ -24,10 +24,13 @@ DEFAULT_REQUIRED_KEYS = ['aws_profile']
 # Fallback values for some configuration options
 DEFAULT_FALLBACK = {'aws_profile': 'default'}
 
+CONFIG_FILE_TEMPLATE = os.path.join(boto3facade.__dir__, "boto3facade.ini")
+
 
 class Config:
     def __init__(self, env_prefix=DEFAULT_ENV_PREFIX,
                  config_file=DEFAULT_CONFIG_FILE,
+                 config_file_template=CONFIG_FILE_TEMPLATE,
                  active_profile=DEFAULT_ACTIVE_PROFILE,
                  logger=DEFAULT_LOGGER,
                  required_keys=DEFAULT_REQUIRED_KEYS,
@@ -49,7 +52,7 @@ class Config:
         self.required_keys = required_keys
 
         if not os.path.isfile(config_file):
-            shutil.copyfile(boto3facade.__default_config_file__, config_file)
+            shutil.copyfile(CONFIG_FILE_TEMPLATE, config_file)
 
         self.config = configparser.ConfigParser()
         self.load()

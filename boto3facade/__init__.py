@@ -12,4 +12,3 @@ __license__ = metadata.license
 __copyright__ = metadata.copyright
 
 __dir__ = os.path.dirname(inspect.getfile(inspect.currentframe()))
-__default_config_file__ = os.path.join(__dir__, 'boto3facade.ini')
