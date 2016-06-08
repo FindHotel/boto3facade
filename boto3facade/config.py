@@ -52,7 +52,7 @@ class Config:
         self.required_keys = required_keys
 
         if not os.path.isfile(config_file):
-            shutil.copyfile(CONFIG_FILE_TEMPLATE, config_file)
+            shutil.copyfile(config_file_template, config_file)
 
         self.config = configparser.ConfigParser()
         self.load()
