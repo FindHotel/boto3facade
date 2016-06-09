@@ -1,7 +1,7 @@
 boto3facade
 =========================
 
-[![Build Status](https://travis-ci.org/findhotel/boto3facade.svg?branch=master)](https://travis-ci.org/findhotel/boto3facade)
+[![Build Status](https://travis-ci.org/FindHotel/boto3facade.svg?branch=master)](https://travis-ci.org/FindHotel/boto3facade)
 [![PyPI](https://img.shields.io/pypi/v/boto3facade.svg?style=flat)](https://pypi.python.org/pypi/boto3facade)
 
 A simple facade for [boto3][boto3] that makes some common tasks easier. The 
@@ -75,6 +75,17 @@ my_sg = my_ec2_facade.get_sg_by_name('sgname')
 ```
 
 
-## Who do I ask?
+## Contact
 
-* German Gomez-Herrero, <german@innovativetravel.eu>
+If you have questions, bug reports, suggestions, etc. please create an issue on
+the [GitHub project page](http://github.com/FindHotel/boto3facade).
+
+
+## License
+
+This software is licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License)
+
+See [License file](https://github.com/humilis/humilis-kinesis-processor/blob/master/LICENSE.txt)
+
+
+© 2016 German Gomez-Herrero, and FindHotel.
