@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-"""A simple facade for boto3"""
+"""A simple facade for boto3."""
 
-from boto3facade import metadata
 import os
 import inspect
 
 
-__version__ = metadata.version
-__author__ = metadata.authors[0]
-__license__ = metadata.license
-__copyright__ = metadata.copyright
-
+__version__ = "0.2.5"
 __dir__ = os.path.dirname(inspect.getfile(inspect.currentframe()))

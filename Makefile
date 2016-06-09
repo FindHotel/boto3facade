@@ -8,7 +8,7 @@ PYTHON := .env/bin/python
 
 # install all needed for development
 develop: .env
-	$(PIP) install -r requirements-dev.txt -e .
+	$(PIP) install -r requirements-dev.txt -r requirements-test.txt -e .
 
 test: .env
 	$(PIP) install tox

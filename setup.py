@@ -1,45 +1,45 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+"""Setuptools entry point."""
 
 from setuptools import setup, find_packages
-import boto3facade.metadata as metadata
+
+import boto3facade
 
 try:
     import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
+    long_description = pypandoc.convert("README.md", 'rst')
 except(IOError, ImportError, RuntimeError):
-    long_description = open('README.md').read()
+    long_description = open("README.md").read()
 
 
 setup(
-    name='boto3facade',
+    name="boto3facade",
     packages=find_packages(),
-    version=metadata.version,
+    version=boto3facade.__version__,
     package_data={'': ['*.ini']},
-    description=metadata.description,
+    description="A simple facade for Boto3",
     long_description=long_description,
-    author=metadata.authors[0],
-    author_email=metadata.emails[0],
-    url=metadata.url,
-    license=metadata.license,
+    author="German Gomez Herrero, FindHotel BV",
+    author_email="data@findhotel.net",
+    url="http://github.com/findhotel/boto3facade",
+    license="MIT",
     # To integrate py.test with setuptools
-    setup_requires=['pytest-runner'],
+    setup_requires=["pytest-runner"],
     classifiers=[
-        'Programming Language :: Python :: 3',
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
     ],
     install_requires=[
-        'click>=5.1',
-        'boto3',
-        'inflection>=0.3.1',
-        'requests>=2.8.1',
-        'configparser>=3.5.0b2'
+        "click>=5.1",
+        "boto3",
+        "inflection>=0.3.1",
+        "requests>=2.8.1",
+        "configparser>=3.5.0b2"
     ],
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
-        'pytest>=2.5.1',
-        'mock>=1.0.1',
-        'flake8>=2.1.0'
+        "pytest>=2.5.1",
+        "mock>=1.0.1",
+        "flake8>=2.1.0"
     ],
     zip_safe=False
 )
