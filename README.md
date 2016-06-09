@@ -1,8 +1,8 @@
 boto3facade
 =========================
 
-[![Build Status](https://travis-ci.org/InnovativeTravel/boto3facade.svg?branch=master)](https://travis-ci.org/InnovativeTravel/boto3facade)
-[![PyPI](https://img.shields.io/pypi/v/humilis.svg?style=flat)](https://pypi.python.org/pypi/boto3facade)
+[![Build Status](https://travis-ci.org/findhotel/boto3facade.svg?branch=master)](https://travis-ci.org/findhotel/boto3facade)
+[![PyPI](https://img.shields.io/pypi/v/boto3facade.svg?style=flat)](https://pypi.python.org/pypi/boto3facade)
 
 A simple facade for [boto3][boto3] that makes some common tasks easier. The 
 `boto3facade` module is not intended to be used directly but as a shared
