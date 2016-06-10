@@ -1,10 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""S3 facade."""
 
+from .aws import AwsFacade
+from .utils import log_exception
 
-from boto3facade.aws import AwsFacade
 from botocore.exceptions import ClientError
-from boto3facade.utils import log_exception
 
 
 class S3(AwsFacade):

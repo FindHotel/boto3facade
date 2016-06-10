@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Kms facade."""
 
 
 from boto3facade.aws import AwsFacade

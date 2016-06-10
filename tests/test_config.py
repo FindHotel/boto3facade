@@ -5,11 +5,9 @@ import pytest
 import uuid
 import shutil
 import tempfile
-import configparser
 import os
 from boto3facade.ec2 import Ec2
 from boto3facade.redshift import Redshift
-import boto3facade.config
 from boto3facade.config import Config
 from boto3facade.exceptions import InvalidConfiguration
 
@@ -157,20 +155,6 @@ def test_configure_new_local_profile(configured_config, monkeypatch):
     assert os.path.basename(configured_config.config_file) == orig_basename
     # cleanup
     shutil.rmtree(dirpath)
-
-
-def test_aws_signature_version(custom_aws_config_file,
-                               custom_aws_config_dir, monkeypatch):
-    monkeypatch.setattr(boto3facade.config, 'AWS_CONFIG_DIR',
-                        custom_aws_config_dir)
-    monkeypatch.setattr(boto3facade.config, 'AWS_CONFIG_FILE',
-                        custom_aws_config_file)
-    config = Config(keys=[], required_keys=[])
-    config.configure(ask=False)
-    # Check the the AWS config file has been properly updated
-    cfg = configparser.ConfigParser()
-    cfg.read(custom_aws_config_file)
-    assert cfg['default'].get('s3') == '\nsignature_version = s3v4'
 
 
 def test_constructor_with_config_object(vanilla_config):

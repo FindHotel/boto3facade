@@ -1,13 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+"""Configuration management."""
 
 import configparser
-import shutil
-import os
-import boto3facade
 import logging
-from boto3facade.exceptions import InvalidConfiguration
+import os
+import shutil
+
+from boto3facade import __dir__
+from .exceptions import InvalidConfiguration
 
 
 AWS_CONFIG_DIR = os.path.expanduser('~/.aws')
@@ -24,7 +23,7 @@ DEFAULT_REQUIRED_KEYS = ['aws_profile']
 # Fallback values for some configuration options
 DEFAULT_FALLBACK = {'aws_profile': 'default'}
 
-CONFIG_FILE_TEMPLATE = os.path.join(boto3facade.__dir__, "boto3facade.ini")
+CONFIG_FILE_TEMPLATE = os.path.join(__dir__, "boto3facade.ini")
 
 
 class Config:
@@ -78,7 +77,6 @@ class Config:
 
         # We just updated the ini file: reload
         self.profile = self.get_profile(self.active_profile)
-        self._configure_signature()
         is_ok, msg = self._config_ok()
         if not is_ok:
             raise InvalidConfiguration(msg, logger=self.logger)
@@ -95,22 +93,6 @@ class Config:
         """Writes a configuration set in the AWS CLI and SDK config file"""
         with open(AWS_CONFIG_FILE, 'w') as f:
             cfg.write(f)
-
-    def _configure_signature(self):
-        """Sets up the AWS profile to use signature version 4"""
-        aws_profile = self.get_profile_option(self.active_profile,
-                                              'aws_profile')
-        if aws_profile is None or aws_profile == 'default':
-            section = 'default'
-        else:
-            section = "profile " + aws_profile
-
-        cfg = self._read_aws_config()
-        if section in cfg.sections():
-            cfg[section]['s3'] = "\nsignature_version = s3v4"
-        else:
-            cfg[section] = {'s3': "\nsignature_version = s3v4"}
-        self._write_aws_config(cfg)
 
     def _get_config(self, option, ask=True, fallback=None):
         val = self.profile.get(option.lower())

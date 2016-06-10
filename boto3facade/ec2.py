@@ -1,19 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""EC2 facade."""
 
 
 from __future__ import print_function
-import json
-import os
-import logging
-import boto3facade.utils as utils
-from boto3facade.iam import Iam
-from boto3facade.aws import AwsFacade
+
 from collections import namedtuple
+import json
+import logging
+import os
 import requests
 from requests.adapters import ConnectTimeout
 from requests.exceptions import ConnectionError
-from boto3facade.exceptions import InvalidInstanceMetadataFieldError
+
+from . import utils
+from .iam import Iam
+from .aws import AwsFacade
+from .exceptions import InvalidInstanceMetadataFieldError
 
 
 logger = logging.getLogger(__name__)
