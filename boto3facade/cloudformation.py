@@ -4,9 +4,9 @@ import time
 
 from botocore.exceptions import ClientError
 
-from boto3facade.aws import AwsFacade
-from boto3facade.exceptions import AwsError, NoUpdatesError, StackNotFoundError
-import boto3facade.utils as utils
+from .aws import AwsFacade
+from .exceptions import AwsError, NoUpdatesError, StackNotFoundError
+from . import utils
 
 
 CF_TIMEOUT = 10*60

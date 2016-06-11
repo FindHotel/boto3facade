@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""IAM facade."""
 
 
-from boto3facade.aws import AwsFacade
+from .aws import AwsFacade
 
 
 class Iam(AwsFacade):

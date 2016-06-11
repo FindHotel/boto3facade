@@ -1,16 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+"""Generic AWS facade class."""
 
 import abc
 import inflection
 import os
 from configparser import ConfigParser
 from collections import namedtuple
-import boto3facade.utils as utils
-from boto3facade.config import Config
-from boto3facade.exceptions import CredentialsError
+
+import botocore.config
 from boto3.session import Session
+
+from . import utils
+from .config import Config
+from .exceptions import CredentialsError
 
 
 Credentials = namedtuple('Credentials', 'key_id secret_key')
@@ -30,6 +31,7 @@ class AwsFacade():
         self.__session = None
         self.__client = None
         self.__resource = None
+        self.__botocore_config = None
 
     @abc.abstractproperty
     def service(self):
@@ -57,15 +59,26 @@ class AwsFacade():
         return self.__session
 
     @property
+    def botocore_config(self):
+        """Advanced client/resource configuration options."""
+        if self.__botocore_config is None:
+            # Among other things, using KMS with S3 requires v4
+            self.__botocore_config = botocore.config.Config(
+                signature_version="s3v4")
+        return self.__botocore_config
+
+    @property
     def client(self):
         if self.__client is None:
-            self.__client = self.session.client(self.service)
+            self.__client = self.session.client(
+                self.service, config=self.botocore_config)
         return self.__client
 
     @property
     def resource(self):
         if self.__resource is None:
-            self.__resource = self.session.resource(self.service)
+            self.__resource = self.session.resource(
+                self.service, config=self.botocore_config)
         return self.__resource
 
     def get_resource_by_tag(self, *args, **kwargs):

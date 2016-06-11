@@ -1,10 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Redshift facade."""
 
 
-import boto3facade.ec2 as ec2
-from boto3facade.aws import AwsFacade
-from boto3facade.exceptions import CredentialsError
+from . import ec2
+from .aws import AwsFacade
+from .exceptions import CredentialsError
 
 
 class Redshift(AwsFacade):

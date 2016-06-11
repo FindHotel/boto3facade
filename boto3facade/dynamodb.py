@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Dynamodb facade."""
 
-
-from boto3facade.aws import AwsFacade
+from .aws import AwsFacade
 
 
 class Dynamodb(AwsFacade):
