@@ -85,7 +85,7 @@ the [GitHub project page](http://github.com/FindHotel/boto3facade).
 
 This software is licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License)
 
-See [License file](https://github.com/boto3facade/boto3facade/blob/master/LICENSE)
+See [License file](https://github.com/FindHotel/boto3facade/blob/master/LICENSE)
 
 
 © 2016 German Gomez-Herrero, and FindHotel.
