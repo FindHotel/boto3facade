@@ -17,7 +17,7 @@ components of projects that use boto3.
 To install the development version:
 
 ```
-    pip install git+https://github.com/InnovativeTravel/boto3facade
+    pip install git+https://github.com/FindHotel/boto3facade
 ```
 
 To install the latest stable release:
@@ -29,7 +29,7 @@ To install the latest stable release:
 ## Quickstart
 
 The `boto3facade` package contains a collection of modules that implement
-facades to different AWS services. For instnce the `boto3facade.ec2` module
+facades to different AWS services. For instance the `boto3facade.ec2` module
 implements the facade to [AWS EC2 service][ec2]. Each of these modules 
 typically contain just one class, named as the corresponding AWS service. E.g.
 the `boto3facade.ec2` module contains an `Ec2` class. In some cases, there may
@@ -49,7 +49,7 @@ else:
     role_name = None
 ```
 
-Facade methods that actually use the `boto3` are implemented as instance
+Facade methods that actually use `boto3` are always implemented as instance
 methods:
 
 ```python
@@ -85,7 +85,7 @@ the [GitHub project page](http://github.com/FindHotel/boto3facade).
 
 This software is licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License)
 
-See [License file](https://github.com/humilis/humilis-kinesis-processor/blob/master/LICENSE.txt)
+See [License file](https://github.com/boto3facade/boto3facade/blob/master/LICENSE)
 
 
 © 2016 German Gomez-Herrero, and FindHotel.
