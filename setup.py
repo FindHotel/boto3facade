@@ -1,14 +1,22 @@
 """Setuptools entry point."""
 
+import codecs
+import os
 from setuptools import setup, find_packages
 
 import boto3facade
 
+dirname = os.path.dirname(__file__)
+
 try:
     import pypandoc
-    long_description = pypandoc.convert("README.md", 'rst')
+    long_description = pypandoc.convert('README.md', 'rst')
 except(IOError, ImportError, RuntimeError):
-    long_description = open("README.md").read()
+    if os.path.isfile("README.md"):
+        long_description = codecs.open(os.path.join(dirname, "README.md"),
+                                       encoding="utf-8").read()
+    else:
+        long_description = "A simple facade for boto3"
 
 
 setup(
