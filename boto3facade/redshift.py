@@ -20,13 +20,14 @@ class Redshift(AwsFacade):
 
     def get_current_cluster_snapshot(self, identifier, **kwargs):
         """Get Redshift cluster snapshot by identifier."""
-        snapshots = [c for c
-                     in self.client.describe_cluster_snapshots()["Snapshots"]
-                     if c["ClusterIdentifier"] == identifier]
+        return self.get_cluster_snapshots(identifier)[0]
 
-        if snapshots:
-            return sorted(snapshots, key=lambda c: c["SnapshotCreateTime"],
-                          reverse=True)[0]
+    def get_cluster_snapshots(self, identifier, **kwargs):
+        """Get the list of existing cluster snapshots."""
+        return sorted([c for c
+                       in self.client.describe_cluster_snapshots()["Snapshots"]
+                       if c["ClusterIdentifier"] == identifier],
+                      key=lambda c: c["SnapshotCreateTime"], reverse=True)
 
     def get_subnet_group_by_name(self, name, **kwargs):
         """Get the Redshift subnet group with the given name"""
