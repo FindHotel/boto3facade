@@ -11,16 +11,27 @@ class Redshift(AwsFacade):
     def service(self):
         return 'redshift'
 
-    def get_cluster_by_tag(self, tags, **kwargs):
-        """Gets a list of clusters that match the provided set of tags"""
-        return self.get_resource_by_tag('Cluster', tags, **kwargs)
+    def get_cluster_by_identifier(self, identifier, **kwargs):
+        """Get Redshift cluster by identifier."""
+        cluster = [c for c in self.client.describe_clusters()["Clusters"]
+                   if c["ClusterIdentifier"] == identifier]
+        if cluster:
+            return cluster[0]
+
+    def get_snapshot_by_identifier(self, identifier, **kwargs):
+        """Get Redshift cluster snapshot by identifier."""
+        snapshot = [c for c
+                    in self.client.describe_cluster_snapshots()["Snapshots"]
+                    if c["SnapshotIdentifier"] == identifier]
+        if snapshot:
+            return snapshot[0]
 
     def get_subnet_group_by_name(self, name, **kwargs):
-        """Gets the Redshift subnet group with the given name"""
+        """Get the Redshift subnet group with the given name"""
         raise NotImplementedError()
 
     def get_copy_credentials(self):
-        """Produces the credentials parameter for the copy command"""
+        """Produce the credentials parameter for the copy command"""
         # Attempt to get temporary (role) creds
         creds = ec2.get_temporary_credentials()
         if creds is not None:
