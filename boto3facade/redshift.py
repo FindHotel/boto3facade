@@ -20,7 +20,9 @@ class Redshift(AwsFacade):
 
     def get_current_cluster_snapshot(self, identifier, **kwargs):
         """Get Redshift cluster snapshot by identifier."""
-        return self.get_cluster_snapshots(identifier)[0]
+        snapshots = self.get_cluster_snapshots(identifier)
+        if snapshots:
+            return snapshots[0]
 
     def get_cluster_snapshots(self, identifier, **kwargs):
         """Get the list of existing cluster snapshots."""
