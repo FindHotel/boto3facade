@@ -10,9 +10,14 @@ from . import utils
 
 
 CF_TIMEOUT = 10*60
+CACHE_TIMEOUT = 10  # seconds
 
 
 class Cloudformation(AwsFacade):
+    def __init__(self, *args, **kwargs):
+        super(self.__class__, self).__init__(*args, **kwargs)
+        self.__stacks = None
+
     @property
     def service(self):
         return 'cloudformation'
@@ -20,7 +25,13 @@ class Cloudformation(AwsFacade):
     @property
     def stacks(self):
         """Produces a list of CF stack description objects."""
-        return self.client.describe_stacks().get('Stacks')
+        if not self.__stacks or \
+                (time.time() - self.__stacks["ts"]) > CACHE_TIMEOUT:
+            self.__stacks = {
+                'ts': time.time(),
+                'stacks': self.client.describe_stacks().get('Stacks', [])}
+
+        return self.__stacks["stacks"]
 
     @property
     def stack_statuses(self):
@@ -35,7 +46,7 @@ class Cloudformation(AwsFacade):
     def _get_stack_property(self, property_name):
         """Gets the value of certain stack property for every stack in CF."""
         return {s.get('StackName'): s.get(property_name) for s
-                in self.client.describe_stacks().get('Stacks', [])}
+                in self.stacks}
 
     def delete_stack(self, stack_name, wait=CF_TIMEOUT):
         """Deletes a CF stack, if it exists in CF."""

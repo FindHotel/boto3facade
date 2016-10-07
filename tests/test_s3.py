@@ -4,7 +4,7 @@
 
 import pytest
 import boto3facade.s3
-from botocore.exceptions import ClientError
+from boto3.exceptions import S3UploadFailedError
 import tempfile
 import os
 import uuid
@@ -47,5 +47,5 @@ def test_cp(s3, local_file, s3bucket, s3key):
 
 def test_cp_invalid_bucket(s3, local_file, s3key):
     s3bucket = str(uuid.uuid4())
-    with pytest.raises(ClientError):
+    with pytest.raises(S3UploadFailedError):
         s3.cp(local_file, s3bucket, s3key)

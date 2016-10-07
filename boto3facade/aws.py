@@ -17,7 +17,7 @@ from .exceptions import CredentialsError
 Credentials = namedtuple('Credentials', 'key_id secret_key')
 
 
-class AwsFacade():
+class AwsFacade(object):
     """Common facade functionality across AWS service facades"""
     def __init__(self, config=None, **kwargs):
         """Initializes the proxy object configuration object"""
