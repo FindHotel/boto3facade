@@ -22,10 +22,9 @@ class Cloudformation(AwsFacade):
     def service(self):
         return 'cloudformation'
 
-    @property
-    def stacks(self):
+    def stacks(self, clear_cache=False):
         """Produces a list of CF stack description objects."""
-        if not self.__stacks or \
+        if clear_cache or not self.__stacks or \
                 (time.time() - self.__stacks["ts"]) > CACHE_TIMEOUT:
             self.__stacks = {
                 'ts': time.time(),
