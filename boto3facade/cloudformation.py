@@ -182,7 +182,8 @@ class Cloudformation(AwsFacade):
     def get_stack_status(self, stack_name):
         """Gets the current status of a CF stack."""
         stack = self.get_stack(stack_name)
-        return stack.stack_status
+        if stack:
+            return stack.stack_status
 
     def get_stack_events(self, stack_name):
         """Gets a list of stack events sorted by timestamp."""
