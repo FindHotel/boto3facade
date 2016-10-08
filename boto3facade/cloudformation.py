@@ -190,3 +190,5 @@ class Cloudformation(AwsFacade):
         stack = self.get_stack(stack_name)
         if stack:
             return sorted(stack.events.all(), key=lambda ev: ev.timestamp)
+        else:
+            return []
