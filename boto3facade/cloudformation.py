@@ -10,7 +10,7 @@ from . import utils
 
 
 CF_TIMEOUT = 10*60
-CACHE_TIMEOUT = 10  # seconds
+CACHE_TIMEOUT = 5  # seconds
 
 
 class Cloudformation(AwsFacade):
@@ -87,7 +87,8 @@ class Cloudformation(AwsFacade):
         if wait:
             self.wait_for_status_change(stack_name, 'CREATE_IN_PROGRESS')
         stack_status = self.stack_statuses.get(stack_name)
-        if stack_status.find('FAILED') > -1:
+
+        if stack_status and stack_status.find('FAILED') > -1:
             msg = "Failed to create stack {}. Stack status is {}.".format(
                 stack_name, stack_status)
             raise AwsError(msg, logger=self.config.logger)
