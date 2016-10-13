@@ -36,7 +36,6 @@ class Cloudformation(AwsFacade):
     @property
     def stack_statuses(self):
         """Returns a dict with the status of every stack in CF"""
-        self.flush_cache()
         return self._get_stack_property('StackStatus')
 
     @property
@@ -126,15 +125,25 @@ class Cloudformation(AwsFacade):
                 stack_name, stack_status)
             raise AwsError(msg, logger=self.config.logger)
 
-    def stack_exists(self, stack_name):
+    def stack_exists(self, stack_name, flush=True):
         """Checks whether a stack exists in CF."""
-        return stack_name in self.stack_statuses
+        exists = stack_name in self.stack_statuses
+        if flush and not exists:
+            self.flush_cache()
+            return self.stack_exists(stack_name, flush=False)
+        else:
+            return exists
 
-    def stack_ok(self, stack_name):
+    def stack_ok(self, stack_name, flush=True):
         """Checks whether a stack is operational."""
-        return self.stack_exists(stack_name) and \
+        is_ok = self.stack_exists(stack_name) and \
             self.stack_statuses.get(stack_name) \
             in {'UPDATE_COMPLETE', 'CREATE_COMPLETE'}
+        if flush and not is_ok:
+            self.flush_cache()
+            return self.stack_ok(stack_name, flush=False)
+        else:
+            return is_ok
 
     def wait_for_status_change(self, stack_name, status,
                                nb_seconds=CF_TIMEOUT):
