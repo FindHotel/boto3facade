@@ -36,12 +36,17 @@ class Cloudformation(AwsFacade):
     @property
     def stack_statuses(self):
         """Returns a dict with the status of every stack in CF"""
+        self.flush_cache()
         return self._get_stack_property('StackStatus')
 
     @property
     def stack_outputs(self):
         """Returns a dict with the outputs for every stack in CF."""
         return self._get_stack_property('Outputs')
+
+    def flush_cache(self):
+        """Flush the CF Stacks cache."""
+        self.__stacks = None
 
     def _get_stack_property(self, property_name):
         """Gets the value of certain stack property for every stack in CF."""
