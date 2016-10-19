@@ -138,7 +138,8 @@ class Cloudformation(AwsFacade):
         """Checks whether a stack is operational."""
         is_ok = self.stack_exists(stack_name) and \
             self.stack_statuses.get(stack_name) \
-            in {'UPDATE_COMPLETE', 'CREATE_COMPLETE'}
+            in {'UPDATE_COMPLETE', 'CREATE_COMPLETE',
+                'UPDATE_ROLLBACK_COMPLETE'}
         if flush and not is_ok:
             self.flush_cache()
             return self.stack_ok(stack_name, flush=False)
