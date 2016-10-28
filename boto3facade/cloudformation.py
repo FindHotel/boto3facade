@@ -9,7 +9,7 @@ from .exceptions import AwsError, NoUpdatesError, StackNotFoundError
 from . import utils
 
 
-CF_TIMEOUT = 10*60
+CF_TIMEOUT = 20*60
 CACHE_TIMEOUT = 5  # seconds
 
 
