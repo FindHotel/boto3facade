@@ -102,8 +102,14 @@ class Config:
         if fallback and val is None:
             val = fallback.get(option.lower())
         if ask:
-            resp = input("{} [{}]: ".format(
-                option.replace('_', ' ').title(), val))
+            try:
+                resp = raw_input("{} [{}]: ".format(
+                    option.replace('_', ' ').title(), val))
+            except NameError:
+                # Python 3.x
+                resp = input("{} [{}]: ".format(
+                    option.replace('_', ' ').title(), val))
+
             if len(resp) > 0:
                 return resp
         return val
