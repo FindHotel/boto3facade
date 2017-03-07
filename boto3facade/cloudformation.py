@@ -13,6 +13,17 @@ CF_TIMEOUT = 20*60
 CACHE_TIMEOUT = 5  # seconds
 
 
+def retry_after_flush(func):
+    def wrapper(self, *args, **kwargs):
+        try:
+            func(self, *args, **kwargs)
+        except:
+            self.flush_cache()
+            func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class Cloudformation(AwsFacade):
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -52,6 +63,7 @@ class Cloudformation(AwsFacade):
         return {s.get('StackName'): s.get(property_name) for s
                 in self.stacks}
 
+    @retry_after_flush
     def delete_stack(self, stack_name, wait=CF_TIMEOUT):
         """Deletes a CF stack, if it exists in CF."""
         stack_status = self.stack_statuses.get(stack_name)
