@@ -55,10 +55,11 @@ class Cloudformation(AwsFacade):
 
     def _describe_all_stacks(self):
         """Unpaginate the result of boto3 describe_stacks."""
-        all_stacks = []
-        next_token = "yeah"
+        resp = self.client.describe_stacks()
+        next_token = resp.get('NextToken')
+        all_stacks = resp.get('Stacks', [])
         while next_token:
-            resp = self.client.describe_stacks()
+            resp = self.client.describe_stacks(NextToken=next_token)
             next_token = resp.get('NextToken')
             all_stacks += resp.get('Stacks', [])
         return all_stacks

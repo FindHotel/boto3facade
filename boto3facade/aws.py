@@ -8,6 +8,8 @@ from collections import namedtuple
 
 import botocore.config
 from boto3.session import Session
+from retrying import retry
+import wrapt
 
 from . import utils
 from .config import Config
@@ -15,6 +17,21 @@ from .exceptions import CredentialsError
 
 
 Credentials = namedtuple('Credentials', 'key_id secret_key')
+
+
+class RetriedClient(wrapt.ObjectProxy):
+    """Add retry logic to a boto3 client."""
+
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=10000)
+    def __getattr__(self, name):
+            # If we are being to lookup '__wrapped__' then the
+            # '__init__()' method cannot have been called.
+            print("Getting {}".format(name))
+
+            if name == '__wrapped__':
+                raise ValueError('wrapper has not been initialised')
+
+            return getattr(self.__wrapped__, name)
 
 
 class AwsFacade(object):
@@ -70,8 +87,8 @@ class AwsFacade(object):
     @property
     def client(self):
         if self.__client is None:
-            self.__client = self.session.client(
-                self.service, config=self.botocore_config)
+            self.__client = RetriedClient(
+                self.session.client(self.service, config=self.botocore_config))
         return self.__client
 
     @property

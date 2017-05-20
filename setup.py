@@ -41,7 +41,9 @@ setup(
         "boto3",
         "inflection>=0.3.1",
         "requests>=2.8.1",
-        "configparser>=3.5.0b2"
+        "configparser>=3.5.0b2",
+        "wrapt",
+        "retrying"
     ],
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
