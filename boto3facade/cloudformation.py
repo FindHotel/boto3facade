@@ -40,8 +40,7 @@ class Cloudformation(AwsFacade):
                 (time.time() - self.__stacks["ts"]) > CACHE_TIMEOUT:
             self.__stacks = {
                 'ts': time.time(),
-                'stacks': self.client.describe_stacks().get('Stacks', [])}
-
+                'stacks': self._describe_all_stacks()}
         return self.__stacks["stacks"]
 
     @property
@@ -53,6 +52,16 @@ class Cloudformation(AwsFacade):
     def stack_outputs(self):
         """Returns a dict with the outputs for every stack in CF."""
         return self._get_stack_property('Outputs')
+
+    def _describe_all_stacks(self):
+        """Unpaginate the result of boto3 describe_stacks."""
+        all_stacks = []
+        next_token = "yeah"
+        while next_token:
+            resp = self.client.describe_stacks()
+            next_token = resp.get('NextToken')
+            all_stacks += resp.get('Stacks', [])
+        return all_stacks
 
     def flush_cache(self):
         """Flush the CF Stacks cache."""
