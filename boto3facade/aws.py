@@ -24,10 +24,6 @@ class RetriedClient(wrapt.ObjectProxy):
 
     @retry(wait_exponential_multiplier=1000, wait_exponential_max=10000)
     def __getattr__(self, name):
-            # If we are being to lookup '__wrapped__' then the
-            # '__init__()' method cannot have been called.
-            print("Getting {}".format(name))
-
             if name == '__wrapped__':
                 raise ValueError('wrapper has not been initialised')
 
