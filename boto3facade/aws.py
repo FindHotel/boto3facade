@@ -19,8 +19,8 @@ from .exceptions import CredentialsError
 Credentials = namedtuple('Credentials', 'key_id secret_key')
 
 
-class RetriedClient(wrapt.ObjectProxy):
-    """Add retry logic to a boto3 client."""
+class Retried(wrapt.ObjectProxy):
+    """Add retry logic to a boto3 client or resource."""
 
     @retry(wait_exponential_multiplier=1000, wait_exponential_max=10000)
     def __getattr__(self, name):
@@ -83,15 +83,15 @@ class AwsFacade(object):
     @property
     def client(self):
         if self.__client is None:
-            self.__client = RetriedClient(
+            self.__client = Retried(
                 self.session.client(self.service, config=self.botocore_config))
         return self.__client
 
     @property
     def resource(self):
         if self.__resource is None:
-            self.__resource = self.session.resource(
-                self.service, config=self.botocore_config)
+            self.__resource = Retried(self.session.resource(
+                self.service, config=self.botocore_config))
         return self.__resource
 
     def get_resource_by_tag(self, *args, **kwargs):
