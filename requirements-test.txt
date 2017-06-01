@@ -1,6 +1,4 @@
 # Test requirements
-appdirs
-packaging
 pytest
 pytest-cov
 

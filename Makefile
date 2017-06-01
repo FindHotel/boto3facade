@@ -5,7 +5,6 @@ PYTHON := .env/bin/python
 # create virtual environment
 .env:
 	virtualenv .env -p python3
-	$(PIP) install appdirs packaging
 
 # install all needed for development
 develop: .env
@@ -20,4 +19,4 @@ pypi:
 
 # clean the development envrironment
 clean:
-	-rm -rf .env
+	-rm -rf .env .tox

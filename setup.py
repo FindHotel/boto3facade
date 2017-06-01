@@ -30,8 +30,6 @@ setup(
     author_email="data@findhotel.net",
     url="http://github.com/findhotel/boto3facade",
     license="MIT",
-    # To integrate py.test with setuptools
-    setup_requires=["pytest-runner"],
     classifiers=[
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
@@ -45,11 +43,4 @@ setup(
         "wrapt",
         "retrying"
     ],
-    # Allow tests to be run with `python setup.py test'.
-    tests_require=[
-        "pytest>=2.5.1",
-        "mock>=1.0.1",
-        "flake8>=2.1.0"
-    ],
-    zip_safe=False
 )
