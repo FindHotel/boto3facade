@@ -77,7 +77,8 @@ class AwsFacade(object):
         if self.__botocore_config is None:
             # Among other things, using KMS with S3 requires v4
             self.__botocore_config = botocore.config.Config(
-                signature_version="s3v4")
+                signature_version="s3v4",
+                retries={"max_attempts": 20})
         return self.__botocore_config
 
     @property
