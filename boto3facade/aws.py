@@ -62,7 +62,10 @@ class AwsFacade(object):
                     os.environ.get("AWS_DEFAULT_REGION")
                 if aws_region:
                     # Region specified in the boto3facade profile.
-                    self.__session = Session(region_name=aws_region)
+                    self.__session = Session(
+                        region_name=aws_region,
+                        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
                 else:
                     # Use the settings in ~/.aws/config
                     self.__session = Session()
